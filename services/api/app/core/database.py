@@ -1,13 +1,31 @@
+from contextlib import contextmanager
+from typing import Iterator
+
 import psycopg
 
 from app.core.config import settings
 
 
+@contextmanager
+def get_database_connection() -> Iterator[psycopg.Connection]:
+    """
+    Open an application database connection.
+
+    Transaction boundaries remain the responsibility of the
+    calling service.
+    """
+    with psycopg.connect(
+        settings.database_url,
+        connect_timeout=5,
+    ) as connection:
+        yield connection
+
+
 def check_database_readiness() -> dict[str, bool]:
     """
-    Verify that PostgreSQL is reachable and pgvector is installed.
+    Verify that PostgreSQL is reachable and pgvector exists.
 
-    This check performs no application data reads or writes.
+    No application data is modified.
     """
     with psycopg.connect(
         settings.database_url,
@@ -15,7 +33,10 @@ def check_database_readiness() -> dict[str, bool]:
     ) as connection:
         with connection.cursor() as cursor:
             cursor.execute("select 1;")
-            database_ready = cursor.fetchone()[0] == 1
+
+            database_ready = (
+                cursor.fetchone()[0] == 1
+            )
 
             cursor.execute(
                 """
@@ -27,7 +48,9 @@ def check_database_readiness() -> dict[str, bool]:
                 """
             )
 
-            pgvector_ready = bool(cursor.fetchone()[0])
+            pgvector_ready = bool(
+                cursor.fetchone()[0]
+            )
 
     return {
         "database": database_ready,
