@@ -10,6 +10,8 @@ services:
       APP_NAME: ${APP_NAME:-SupportPilot AI}
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: ${DATABASE_URL}
+      CHAT_SESSION_SECRET: ${CHAT_SESSION_SECRET}
+      CHAT_SESSION_TTL_MINUTES: ${CHAT_SESSION_TTL_MINUTES:-480}
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
