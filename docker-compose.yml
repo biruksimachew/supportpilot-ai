@@ -9,7 +9,10 @@ services:
     environment:
       APP_NAME: ${APP_NAME:-SupportPilot AI}
       APP_ENV: ${APP_ENV:-local}
+      DATABASE_URL: ${DATABASE_URL}
 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${API_PORT:-8001}:8000"
 

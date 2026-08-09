@@ -1,0 +1,2 @@
+-- SupportPilot AI local seed data.
+-- Synthetic customers, orders and support data will be added in Milestone 1F.
