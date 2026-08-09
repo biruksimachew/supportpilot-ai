@@ -1,0 +1,26 @@
+[
+  {
+    "external_id": "CUST-1001",
+    "name": "Amina Tesfaye",
+    "email": "amina.demo@example.com",
+    "postcode": "10001"
+  },
+  {
+    "external_id": "CUST-1002",
+    "name": "Daniel Reed",
+    "email": "daniel.demo@example.com",
+    "postcode": "10002"
+  },
+  {
+    "external_id": "CUST-1003",
+    "name": "Maya Chen",
+    "email": "maya.demo@example.com",
+    "postcode": "10003"
+  },
+  {
+    "external_id": "CUST-1004",
+    "name": "Noah Williams",
+    "email": "noah.demo@example.com",
+    "postcode": "10004"
+  }
+]

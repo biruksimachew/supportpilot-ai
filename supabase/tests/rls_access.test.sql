@@ -71,6 +71,14 @@ values
 );
 
 
+-- ============================================================
+-- TEST-SCOPED BUSINESS DATA
+--
+-- These IDs are intentionally isolated from normal seed data.
+-- Tests below only count these rows so adding portfolio fixtures
+-- cannot change security-test expectations.
+-- ============================================================
+
 insert into public.customers (
     id,
     external_id,
@@ -79,9 +87,9 @@ insert into public.customers (
 )
 values (
     'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-    'customer-test-001',
-    'customer@example.test',
-    'Test Customer'
+    'customer-rls-test-001',
+    'customer-rls@example.test',
+    'RLS Test Customer'
 );
 
 
@@ -103,7 +111,7 @@ insert into public.orders_cache (
     status
 )
 values (
-    'ORDER-TEST-001',
+    'ORDER-RLS-TEST-001',
     'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
     'IN_TRANSIT'
 );
@@ -120,19 +128,19 @@ insert into public.knowledge_sources (
 values
 (
     'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
-    'Published Shipping Policy',
+    'RLS Published Shipping Policy',
     'POLICY',
-    '1.0',
+    'rls-test-1.0',
     'PUBLISHED',
-    'test-published-checksum'
+    'rls-test-published-checksum'
 ),
 (
     'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
-    'Draft Return Policy',
+    'RLS Draft Return Policy',
     'POLICY',
-    '2.0-draft',
+    'rls-test-2.0-draft',
     'DRAFT',
-    'test-draft-checksum'
+    'rls-test-draft-checksum'
 );
 
 
@@ -141,40 +149,69 @@ values
 -- ============================================================
 
 set local role authenticated;
+
 set local request.jwt.claim.sub =
     '11111111-1111-4111-8111-111111111111';
 
 
 select results_eq(
-    $$select count(*) from public.tickets$$,
+    $$
+        select count(*)
+        from public.tickets
+        where id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    $$,
     array[1::bigint],
     'active support agent can read support tickets'
 );
 
 
 select results_eq(
-    $$select count(*) from public.customers$$,
+    $$
+        select count(*)
+        from public.customers
+        where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    $$,
     array[1::bigint],
     'active support agent can read customer context'
 );
 
 
 select results_eq(
-    $$select count(*) from public.orders_cache$$,
+    $$
+        select count(*)
+        from public.orders_cache
+        where external_order_id = 'ORDER-RLS-TEST-001'
+    $$,
     array[1::bigint],
     'active support agent can read order context'
 );
 
 
 select results_eq(
-    $$select count(*) from public.knowledge_sources$$,
+    $$
+        select count(*)
+        from public.knowledge_sources
+        where id in (
+            'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            'dddddddd-dddd-4ddd-8ddd-dddddddddddd'
+        )
+    $$,
     array[1::bigint],
     'support agent can only read published knowledge'
 );
 
 
 select results_eq(
-    $$select count(*) from public.users$$,
+    $$
+        select count(*)
+        from public.users
+        where id in (
+            '11111111-1111-4111-8111-111111111111',
+            '22222222-2222-4222-8222-222222222222',
+            '33333333-3333-4333-8333-333333333333',
+            '44444444-4444-4444-8444-444444444444'
+        )
+    $$,
     array[3::bigint],
     'support agent only sees active internal staff'
 );
@@ -201,14 +238,30 @@ set local request.jwt.claim.sub =
 
 
 select results_eq(
-    $$select count(*) from public.knowledge_sources$$,
+    $$
+        select count(*)
+        from public.knowledge_sources
+        where id in (
+            'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            'dddddddd-dddd-4ddd-8ddd-dddddddddddd'
+        )
+    $$,
     array[2::bigint],
     'support manager can inspect draft and published knowledge'
 );
 
 
 select results_eq(
-    $$select count(*) from public.users$$,
+    $$
+        select count(*)
+        from public.users
+        where id in (
+            '11111111-1111-4111-8111-111111111111',
+            '22222222-2222-4222-8222-222222222222',
+            '33333333-3333-4333-8333-333333333333',
+            '44444444-4444-4444-8444-444444444444'
+        )
+    $$,
     array[4::bigint],
     'support manager can inspect disabled staff profiles'
 );
@@ -223,7 +276,11 @@ set local request.jwt.claim.sub =
 
 
 select results_eq(
-    $$select count(*) from public.tickets$$,
+    $$
+        select count(*)
+        from public.tickets
+        where id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    $$,
     array[0::bigint],
     'authenticated user without active SupportPilot role has no ticket access'
 );

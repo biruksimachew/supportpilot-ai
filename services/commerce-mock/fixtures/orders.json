@@ -1,0 +1,68 @@
+[
+  {
+    "order_number": "#NS10041",
+    "customer_id": "CUST-1001",
+    "status": "IN_TRANSIT",
+    "items": [
+      {
+        "sku": "NST-TRVL-001",
+        "name": "TrailPack 28L",
+        "quantity": 1
+      }
+    ],
+    "tracking_number": "TRK-DEMO-10041",
+    "total": 89.0,
+    "currency": "USD"
+  },
+  {
+    "order_number": "#NS10042",
+    "customer_id": "CUST-1002",
+    "status": "DELIVERED",
+    "delivered_at": "2026-08-06",
+    "items": [
+      {
+        "sku": "NST-BTL-014",
+        "name": "Summit Flask 750ml",
+        "quantity": 1
+      }
+    ],
+    "total": 34.0,
+    "currency": "USD"
+  },
+  {
+    "order_number": "#NS10043",
+    "customer_id": "CUST-1003",
+    "status": "PARTIALLY_FULFILLED",
+    "items": [
+      {
+        "sku": "NST-LGT-220",
+        "name": "CampGlow Lantern",
+        "quantity": 1,
+        "status": "SHIPPED"
+      },
+      {
+        "sku": "NST-ORG-031",
+        "name": "Packing Cube Set",
+        "quantity": 1,
+        "status": "PENDING"
+      }
+    ],
+    "total": 101.0,
+    "currency": "USD"
+  },
+  {
+    "order_number": "#NS10044",
+    "customer_id": "CUST-1004",
+    "status": "PROCESSING",
+    "items": [
+      {
+        "sku": "NST-ORG-031",
+        "name": "Packing Cube Set",
+        "quantity": 2
+      }
+    ],
+    "tracking_number": null,
+    "total": 84.0,
+    "currency": "USD"
+  }
+]
