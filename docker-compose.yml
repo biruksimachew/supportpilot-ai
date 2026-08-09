@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+
+    container_name: supportpilot-api
+
+    environment:
+      APP_NAME: ${APP_NAME:-SupportPilot AI}
+      APP_ENV: ${APP_ENV:-local}
+
+    ports:
+      - "${API_PORT:-8001}:8000"
+
+    volumes:
+      - ./services/api:/app
+
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live')"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+    restart: unless-stopped
