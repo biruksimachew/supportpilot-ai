@@ -46,5 +46,10 @@ class Settings:
         "http://127.0.0.1:3000",
     )
 
+    email_ingest_secret: str = os.getenv(
+        "EMAIL_INGEST_SECRET",
+        "",
+    )
+
 
 settings = Settings()

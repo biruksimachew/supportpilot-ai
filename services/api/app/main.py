@@ -15,9 +15,12 @@ from app.core.config import settings
 from app.api.routes.agent import (
     router as agent_router,
 )
+from app.api.routes.email_intake import (
+    router as email_intake_router,
+)
 app = FastAPI(
     title=settings.app_name,
-    version="0.2.3",
+    version="0.2.4",
     description=(
         "SupportPilot AI support core API."
     ),
@@ -47,7 +50,9 @@ app.include_router(health_router)
 app.include_router(intake_router)
 app.include_router(chat_router)
 app.include_router(agent_router)
-
+app.include_router(
+    email_intake_router
+)
 
 @app.get("/", tags=["system"])
 def root() -> dict[str, str]:

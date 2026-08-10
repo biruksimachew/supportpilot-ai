@@ -15,6 +15,7 @@ services:
       WEB_ORIGIN: ${WEB_ORIGIN:-http://127.0.0.1:3000}
       SUPABASE_URL: ${SUPABASE_URL:-http://host.docker.internal:55321}
       SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      EMAIL_INGEST_SECRET: ${EMAIL_INGEST_SECRET}
 
 
     extra_hosts:
