@@ -7,19 +7,19 @@ services:
     container_name: supportpilot-api
 
     environment:
-      APP_NAME: ${APP_NAME:-SupportPilot AI}
-      APP_ENV: ${APP_ENV:-local}
-      DATABASE_URL: ${DATABASE_URL}
-      CHAT_SESSION_SECRET: ${CHAT_SESSION_SECRET}
-      CHAT_SESSION_TTL_MINUTES: ${CHAT_SESSION_TTL_MINUTES:-480}
-      WEB_ORIGIN: ${WEB_ORIGIN:-http://127.0.0.1:3000}
-      SUPABASE_URL: ${SUPABASE_URL:-http://host.docker.internal:55321}
-      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
-      EMAIL_INGEST_SECRET: ${EMAIL_INGEST_SECRET}
-
+      APP_NAME: "${APP_NAME:-SupportPilot AI}"
+      APP_ENV: "${APP_ENV:-local}"
+      DATABASE_URL: "${DATABASE_URL}"
+      CHAT_SESSION_SECRET: "${CHAT_SESSION_SECRET}"
+      CHAT_SESSION_TTL_MINUTES: "${CHAT_SESSION_TTL_MINUTES:-480}"
+      WEB_ORIGIN: "${WEB_ORIGIN:-http://127.0.0.1:3000}"
+      SUPABASE_URL: "${SUPABASE_URL:-http://host.docker.internal:55321}"
+      SUPABASE_ANON_KEY: "${SUPABASE_ANON_KEY}"
+      EMAIL_INGEST_SECRET: "${EMAIL_INGEST_SECRET}"
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
     ports:
       - "${API_PORT:-8001}:8000"
 
@@ -49,3 +49,35 @@ services:
       start_period: 5s
 
     restart: unless-stopped
+
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.33.7
+
+    container_name: supportpilot-n8n
+
+    restart: unless-stopped
+
+    ports:
+      - "${N8N_HOST_PORT:-5680}:5678"
+
+    environment:
+      N8N_ENCRYPTION_KEY: "${N8N_ENCRYPTION_KEY}"
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+
+      N8N_EDITOR_BASE_URL: "http://localhost:${N8N_HOST_PORT:-5680}"
+      WEBHOOK_URL: "http://localhost:${N8N_HOST_PORT:-5680}/"
+
+      TZ: "UTC"
+      GENERIC_TIMEZONE: "UTC"
+
+    volumes:
+      - supportpilot_n8n_data:/home/node/.n8n
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+
+volumes:
+  supportpilot_n8n_data:

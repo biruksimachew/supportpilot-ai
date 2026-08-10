@@ -1,0 +1,209 @@
+{
+  "name": "SupportPilot - Gmail Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {}
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5cbf697d-0e8a-4de0-a1fb-e484ac49c3f5",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eLSs3ESeGA1O5M8E",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ad910198-bc8e-44d9-9f94-5c5a2c1a5589",
+      "name": "Get a message",
+      "webhookId": "b0f5da78-1cd1-4ccc-af3c-848bbfe21234",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eLSs3ESeGA1O5M8E",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf7a3480-8a54-4e51-a81e-10599a4f7d50",
+              "name": "provider",
+              "value": "gmail",
+              "type": "string"
+            },
+            {
+              "id": "4cecb615-fd74-4fb0-aa32-dde787031543",
+              "name": "external_message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f7c27fc9-46e5-4d1a-bc51-bfaca3d0c365",
+              "name": "external_thread_id",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "25bc03f9-6f01-463c-bbbf-ef20c1b689b7",
+              "name": "from_email",
+              "value": "={{ (($json[\"From\"] || \"\").match(/<([^>]+)>/)?.[1] || ($json[\"From\"] || \"\")).trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "9410f3df-e0e7-4561-b13d-fc4a317f1003",
+              "name": "from_name",
+              "value": "={{ ($json[\"From\"] || \"\").includes(\"<\") ? ($json[\"From\"] || \"\").split(\"<\")[0].trim().replace(/^\"|\"$/g, \"\") || null : null }}",
+              "type": "string"
+            },
+            {
+              "id": "85b49d57-aa65-40e0-9502-1596260ac88d",
+              "name": "subject",
+              "value": "={{ $json[\"Subject\"] || null }}",
+              "type": "string"
+            },
+            {
+              "id": "1345a5a7-3325-459f-9b16-d257e91ace05",
+              "name": "body",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            },
+            {
+              "id": "2faf02e0-19a1-4cd9-941e-b2cfbf78ea6c",
+              "name": "received_at",
+              "value": "={{ new Date(Number($json.internalDate)).toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "eecaf799-93a9-4398-a83a-0ba45f25cf5f",
+              "name": "attachments",
+              "value": "={{ [] }}",
+              "type": "array"
+            },
+            {
+              "id": "5c055497-773b-429f-9c58-702631d9865c",
+              "name": "metadata",
+              "value": "={{   {     gmail_history_id: $json.historyId,     gmail_size_estimate: $json.sizeEstimate,     gmail_labels: ($json.labels || []).map(label => label.id),     gmail_mime_type: $json.payload?.mimeType || null   } }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "ff0e19b4-8fa8-45c6-8cf3-a35026a17b17",
+      "name": "Normalize SupportPilot Email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/api/v1/integrations/email/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    provider: $json.provider,\n    external_message_id: $json.external_message_id,\n    external_thread_id: $json.external_thread_id,\n    from_email: $json.from_email,\n    from_name: $json.from_name || null,\n    subject: $json.subject || null,\n    body: $json.body,\n    received_at: $json.received_at,\n    attachments: $json.attachments || [],\n    metadata: $json.metadata || {}\n  }\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "469fde20-aba2-4f6c-b0f6-2c8389116cd9",
+      "name": "Send to SupportPilot",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TVVeRPNMikMDl6nE",
+          "name": "SupportPilot Email Ingest"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Normalize SupportPilot Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize SupportPilot Email": {
+      "main": [
+        [
+          {
+            "node": "Send to SupportPilot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "edda075d-c4c8-4a29-9d63-78a4f8f0f9ca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2878ba7c6bc556da241acc29ce45d4c4880b3d098e423590d0283ee6551fd4e8"
+  },
+  "nodeGroups": [],
+  "id": "nyByzwRvdKdfa4jj",
+  "tags": []
+}
