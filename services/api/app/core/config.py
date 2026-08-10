@@ -31,5 +31,10 @@ class Settings:
         )
     )
 
+    web_origin: str = os.getenv(
+        "WEB_ORIGIN",
+        "http://127.0.0.1:3000",
+    )
+
 
 settings = Settings()
