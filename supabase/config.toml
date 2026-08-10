@@ -163,7 +163,7 @@ web3 = 30
 [auth.email]
 
 # No public email signup.
-enable_signup = false
+enable_signup = true
 
 double_confirm_changes = true
 enable_confirmations = false

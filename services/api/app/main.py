@@ -36,6 +36,7 @@ app.add_middleware(
         "OPTIONS",
     ],
     allow_headers=[
+        "Authorization",
         "Content-Type",
         "X-Chat-Session-Token",
     ],
