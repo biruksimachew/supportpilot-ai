@@ -13,6 +13,9 @@ services:
       CHAT_SESSION_SECRET: ${CHAT_SESSION_SECRET}
       CHAT_SESSION_TTL_MINUTES: ${CHAT_SESSION_TTL_MINUTES:-480}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://127.0.0.1:3000}
+      SUPABASE_URL: ${SUPABASE_URL:-http://host.docker.internal:55321}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+
 
     extra_hosts:
       - "host.docker.internal:host-gateway"

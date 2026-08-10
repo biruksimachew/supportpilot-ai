@@ -19,6 +19,16 @@ class Settings:
         "postgresql://postgres:postgres@host.docker.internal:55322/postgres",
     )
 
+    supabase_url: str = os.getenv(
+        "SUPABASE_URL",
+        "http://host.docker.internal:55321",
+    )
+
+    supabase_anon_key: str = os.getenv(
+        "SUPABASE_ANON_KEY",
+        "",
+    )
+
     chat_session_secret: str = os.getenv(
         "CHAT_SESSION_SECRET",
         "",
