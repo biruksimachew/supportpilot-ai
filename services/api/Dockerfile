@@ -19,7 +19,9 @@ RUN python -m pip install --upgrade pip \
 
 COPY . .
 
-RUN chown -R appuser:appgroup /app
+RUN mkdir -p /var/cache/fastembed \
+    && chown -R appuser:appgroup /app \
+    && chown -R appuser:appgroup /var/cache/fastembed
 
 USER appuser
 

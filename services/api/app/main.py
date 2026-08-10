@@ -21,9 +21,12 @@ from app.api.routes.email_intake import (
 from app.api.routes.knowledge import (
     router as knowledge_router,
 )
+from app.api.routes.knowledge_index import (
+    router as knowledge_index_router,
+)
 app = FastAPI(
     title=settings.app_name,
-    version="0.3.0",
+    version="0.3.1",
     description=(
         "SupportPilot AI support core API."
     ),
@@ -53,12 +56,9 @@ app.include_router(health_router)
 app.include_router(intake_router)
 app.include_router(chat_router)
 app.include_router(agent_router)
-app.include_router(
-    email_intake_router
-)
-app.include_router(
-    knowledge_router
-)
+app.include_router(email_intake_router)
+app.include_router(knowledge_router)
+app.include_router(knowledge_index_router)
 
 @app.get("/", tags=["system"])
 def root() -> dict[str, str]:

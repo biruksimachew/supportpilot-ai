@@ -16,7 +16,10 @@ class Settings:
 
     database_url: str = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@host.docker.internal:55322/postgres",
+        (
+            "postgresql://postgres:postgres"
+            "@host.docker.internal:55322/postgres"
+        ),
     )
 
     supabase_url: str = os.getenv(
@@ -48,6 +51,52 @@ class Settings:
 
     email_ingest_secret: str = os.getenv(
         "EMAIL_INGEST_SECRET",
+        "",
+    )
+
+    embedding_provider: str = os.getenv(
+        "EMBEDDING_PROVIDER",
+        "local",
+    )
+
+    embedding_dimensions: int = int(
+        os.getenv(
+            "EMBEDDING_DIMENSIONS",
+            "1536",
+        )
+    )
+
+    embedding_timeout_seconds: int = int(
+        os.getenv(
+            "EMBEDDING_TIMEOUT_SECONDS",
+            "30",
+        )
+    )
+
+    local_embedding_model: str = os.getenv(
+        "LOCAL_EMBEDDING_MODEL",
+        "BAAI/bge-small-en-v1.5",
+    )
+
+    local_embedding_native_dimensions: int = int(
+        os.getenv(
+            "LOCAL_EMBEDDING_NATIVE_DIMENSIONS",
+            "384",
+        )
+    )
+
+    local_embedding_cache_dir: str = os.getenv(
+        "LOCAL_EMBEDDING_CACHE_DIR",
+        "/var/cache/fastembed",
+    )
+
+    openai_embedding_model: str = os.getenv(
+        "OPENAI_EMBEDDING_MODEL",
+        "text-embedding-3-small",
+    )
+
+    openai_api_key: str = os.getenv(
+        "OPENAI_API_KEY",
         "",
     )
 

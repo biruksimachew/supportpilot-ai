@@ -9,13 +9,34 @@ services:
     environment:
       APP_NAME: "${APP_NAME:-SupportPilot AI}"
       APP_ENV: "${APP_ENV:-local}"
+
       DATABASE_URL: "${DATABASE_URL}"
+
       CHAT_SESSION_SECRET: "${CHAT_SESSION_SECRET}"
       CHAT_SESSION_TTL_MINUTES: "${CHAT_SESSION_TTL_MINUTES:-480}"
+
       WEB_ORIGIN: "${WEB_ORIGIN:-http://127.0.0.1:3000}"
+
       SUPABASE_URL: "${SUPABASE_URL:-http://host.docker.internal:55321}"
       SUPABASE_ANON_KEY: "${SUPABASE_ANON_KEY}"
+
       EMAIL_INGEST_SECRET: "${EMAIL_INGEST_SECRET}"
+
+      # ------------------------------------------------------
+      # Embeddings
+      # ------------------------------------------------------
+
+      EMBEDDING_PROVIDER: "${EMBEDDING_PROVIDER:-local}"
+      EMBEDDING_DIMENSIONS: "${EMBEDDING_DIMENSIONS:-1536}"
+      EMBEDDING_TIMEOUT_SECONDS: "${EMBEDDING_TIMEOUT_SECONDS:-30}"
+
+      LOCAL_EMBEDDING_MODEL: "${LOCAL_EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}"
+      LOCAL_EMBEDDING_NATIVE_DIMENSIONS: "${LOCAL_EMBEDDING_NATIVE_DIMENSIONS:-384}"
+      LOCAL_EMBEDDING_CACHE_DIR: "${LOCAL_EMBEDDING_CACHE_DIR:-/var/cache/fastembed}"
+
+      # Optional production embedding provider.
+      OPENAI_EMBEDDING_MODEL: "${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -25,6 +46,7 @@ services:
 
     volumes:
       - ./services/api:/app
+      - supportpilot_fastembed_cache:/var/cache/fastembed
 
     command:
       - uvicorn
@@ -81,3 +103,4 @@ services:
 
 volumes:
   supportpilot_n8n_data:
+  supportpilot_fastembed_cache:
