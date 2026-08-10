@@ -18,9 +18,12 @@ from app.api.routes.agent import (
 from app.api.routes.email_intake import (
     router as email_intake_router,
 )
+from app.api.routes.knowledge import (
+    router as knowledge_router,
+)
 app = FastAPI(
     title=settings.app_name,
-    version="0.2.4",
+    version="0.3.0",
     description=(
         "SupportPilot AI support core API."
     ),
@@ -32,10 +35,10 @@ app.add_middleware(
     allow_origins=[
         settings.web_origin,
     ],
-    allow_credentials=False,
     allow_methods=[
         "GET",
         "POST",
+        "PUT",
         "OPTIONS",
     ],
     allow_headers=[
@@ -52,6 +55,9 @@ app.include_router(chat_router)
 app.include_router(agent_router)
 app.include_router(
     email_intake_router
+)
+app.include_router(
+    knowledge_router
 )
 
 @app.get("/", tags=["system"])
