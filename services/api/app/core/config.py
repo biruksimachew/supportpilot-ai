@@ -101,4 +101,27 @@ class Settings:
     )
 
 
+    generation_provider: str = os.getenv(
+        "GENERATION_PROVIDER",
+        "ollama",
+    )
+
+    generation_timeout_seconds: int = int(
+        os.getenv(
+            "GENERATION_TIMEOUT_SECONDS",
+            "180",
+        )
+    )
+
+    ollama_base_url: str = os.getenv(
+        "OLLAMA_BASE_URL",
+        "http://ollama:11434",
+    )
+
+    ollama_model: str = os.getenv(
+        "OLLAMA_MODEL",
+        "qwen3:1.7b",
+    )
+
+
 settings = Settings()
