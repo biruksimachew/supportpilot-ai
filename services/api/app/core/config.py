@@ -124,4 +124,33 @@ class Settings:
     )
 
 
+    evidence_high_similarity: float = float(
+        os.getenv(
+            "EVIDENCE_HIGH_SIMILARITY",
+            "0.73",
+        )
+    )
+
+    evidence_medium_similarity: float = float(
+        os.getenv(
+            "EVIDENCE_MEDIUM_SIMILARITY",
+            "0.58",
+        )
+    )
+
+    evidence_ambiguity_margin: float = float(
+        os.getenv(
+            "EVIDENCE_AMBIGUITY_MARGIN",
+            "0.04",
+        )
+    )
+
+    evidence_conflict_min_similarity: float = float(
+        os.getenv(
+            "EVIDENCE_CONFLICT_MIN_SIMILARITY",
+            "0.58",
+        )
+    )
+
+
 settings = Settings()
