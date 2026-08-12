@@ -32,7 +32,7 @@ from app.api.routes.grounded_answer import (
 )
 app = FastAPI(
     title=settings.app_name,
-    version="0.3.4",
+    version="0.4.0",
     description=(
         "SupportPilot AI support core API."
     ),
@@ -40,7 +40,9 @@ app = FastAPI(
 from app.api.routes.support_ai import (
     router as support_ai_router,
 )
-
+from app.api.routes.commerce import (
+    router as commerce_router,
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -70,6 +72,7 @@ app.include_router(knowledge_index_router)
 app.include_router(knowledge_retrieval_router)
 app.include_router(grounded_answer_router)
 app.include_router(support_ai_router)
+app.include_router(commerce_router)
 
 @app.get("/", tags=["system"])
 def root() -> dict[str, str]:

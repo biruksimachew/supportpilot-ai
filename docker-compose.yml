@@ -48,6 +48,10 @@ services:
       EVIDENCE_AMBIGUITY_MARGIN: "${EVIDENCE_AMBIGUITY_MARGIN:-0.04}"
       EVIDENCE_CONFLICT_MIN_SIMILARITY: "${EVIDENCE_CONFLICT_MIN_SIMILARITY:-0.58}"
 
+      COMMERCE_PROVIDER: "${COMMERCE_PROVIDER:-mock}"
+      COMMERCE_MOCK_BASE_URL: "${COMMERCE_MOCK_BASE_URL:-http://commerce-mock:8080}"
+      COMMERCE_TIMEOUT_SECONDS: "${COMMERCE_TIMEOUT_SECONDS:-10}"
+
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -81,7 +85,12 @@ services:
       retries: 5
       start_period: 5s
 
+    depends_on:
+      commerce-mock:
+        condition: service_healthy
+
     restart: unless-stopped
+
 
 
   n8n:
@@ -132,6 +141,31 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+
+    restart: unless-stopped
+
+  commerce-mock:
+    build:
+      context: ./services/commerce-mock
+      dockerfile: Dockerfile
+
+    container_name: supportpilot-commerce-mock
+
+    expose:
+      - "8080"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health/live', timeout=3)"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
 
     restart: unless-stopped
 

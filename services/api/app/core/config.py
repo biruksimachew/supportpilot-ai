@@ -152,5 +152,22 @@ class Settings:
         )
     )
 
+    commerce_provider: str = os.getenv(
+        "COMMERCE_PROVIDER",
+        "mock",
+    )
+
+    commerce_mock_base_url: str = os.getenv(
+        "COMMERCE_MOCK_BASE_URL",
+        "http://commerce-mock:8080",
+    )
+
+    commerce_timeout_seconds: int = int(
+        os.getenv(
+            "COMMERCE_TIMEOUT_SECONDS",
+            "10",
+        )
+    )
+
 
 settings = Settings()
