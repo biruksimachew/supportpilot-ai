@@ -1,0 +1,185 @@
+{
+  "retrieval_cases": [
+    {
+      "id": "R-01",
+      "baseline_id": "B-02",
+      "question": "Can I return my unused backpack after 18 days?",
+      "expected_source": "Returns Policy"
+    },
+    {
+      "id": "R-02",
+      "question": "How many days do I have to send back an unused purchase?",
+      "expected_source": "Returns Policy"
+    },
+    {
+      "id": "R-03",
+      "baseline_id": "B-05",
+      "question": "My lantern arrived broken. What information do you need from me?",
+      "expected_source": "Damaged Items Policy"
+    },
+    {
+      "id": "R-04",
+      "question": "The product was damaged when it was delivered. What should I do?",
+      "expected_source": "Damaged Items Policy"
+    },
+    {
+      "id": "R-05",
+      "baseline_id": "B-06",
+      "question": "Is TrailPack waterproof?",
+      "expected_source": "Northstar Product Support Facts"
+    },
+    {
+      "id": "R-06",
+      "question": "Can I put the Summit Flask in the dishwasher?",
+      "expected_source": "Northstar Product Support Facts"
+    },
+    {
+      "id": "R-07",
+      "question": "Can I replace the CampGlow Lantern battery myself?",
+      "expected_source": "Northstar Product Support Facts"
+    },
+    {
+      "id": "R-08",
+      "question": "How should I wash the Packing Cube Set?",
+      "expected_source": "Northstar Product Support Facts"
+    },
+    {
+      "id": "R-09",
+      "question": "How long does standard shipping usually take?",
+      "expected_source": "Standard Shipping Policy"
+    },
+    {
+      "id": "R-10",
+      "question": "What is the normal delivery window for standard shipping?",
+      "expected_source": "Standard Shipping Policy"
+    },
+    {
+      "id": "R-11",
+      "question": "Can I exchange an item instead of returning it?",
+      "expected_source": "Exchange Policy"
+    },
+    {
+      "id": "R-12",
+      "question": "What does the product warranty cover?",
+      "expected_source": "Product Warranty Policy"
+    }
+  ],
+
+  "decision_cases": [
+    {
+      "id": "D-01",
+      "name": "missing evidence",
+      "results": [],
+      "expected_band": "LOW",
+      "expected_generation_allowed": false,
+      "expected_contradiction": false,
+      "expected_reason": "EVIDENCE_MISSING"
+    },
+    {
+      "id": "D-02",
+      "name": "weak evidence",
+      "results": [
+        {
+          "source_key": "weak-policy",
+          "similarity": 0.40
+        }
+      ],
+      "expected_band": "LOW",
+      "expected_generation_allowed": false,
+      "expected_contradiction": false,
+      "expected_reason": "EVIDENCE_WEAK"
+    },
+    {
+      "id": "D-03",
+      "name": "medium evidence",
+      "results": [
+        {
+          "source_key": "medium-policy",
+          "similarity": 0.64
+        }
+      ],
+      "expected_band": "MEDIUM",
+      "expected_generation_allowed": true,
+      "expected_contradiction": false,
+      "expected_reason": "EVIDENCE_MEDIUM"
+    },
+    {
+      "id": "D-04",
+      "name": "high evidence",
+      "results": [
+        {
+          "source_key": "high-policy",
+          "similarity": 0.86
+        }
+      ],
+      "expected_band": "HIGH",
+      "expected_generation_allowed": true,
+      "expected_contradiction": false,
+      "expected_reason": "EVIDENCE_HIGH"
+    },
+    {
+      "id": "D-05",
+      "name": "close competing sources",
+      "results": [
+        {
+          "source_key": "policy-a",
+          "similarity": 0.82
+        },
+        {
+          "source_key": "policy-b",
+          "similarity": 0.80
+        }
+      ],
+      "expected_band": "MEDIUM",
+      "expected_generation_allowed": true,
+      "expected_contradiction": false,
+      "expected_reason": "EVIDENCE_AMBIGUOUS"
+    },
+    {
+      "id": "D-06",
+      "baseline_id": "B-08",
+      "name": "explicit contradictory policy claims",
+      "results": [
+        {
+          "source_key": "returns-v1",
+          "similarity": 0.88,
+          "claim_key": "return_window_days",
+          "claim_value": 30
+        },
+        {
+          "source_key": "returns-conflict",
+          "similarity": 0.84,
+          "claim_key": "return_window_days",
+          "claim_value": 45
+        }
+      ],
+      "expected_band": "LOW",
+      "expected_generation_allowed": false,
+      "expected_contradiction": true,
+      "expected_reason": "EVIDENCE_CONTRADICTORY"
+    }
+  ],
+
+  "grounding_cases": [
+    {
+      "id": "G-01",
+      "mode": "valid_answer",
+      "expected_outcome": "ACCEPTED"
+    },
+    {
+      "id": "G-02",
+      "mode": "answered_without_citation",
+      "expected_outcome": "REJECTED"
+    },
+    {
+      "id": "G-03",
+      "mode": "unknown_citation",
+      "expected_outcome": "REJECTED"
+    },
+    {
+      "id": "G-04",
+      "mode": "valid_insufficient_evidence",
+      "expected_outcome": "ACCEPTED"
+    }
+  ]
+}

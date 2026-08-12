@@ -1,0 +1,407 @@
+{
+  "generated_at": "2026-08-12T14:51:10.371851+00:00",
+  "milestone": "M3F",
+  "suite": "SupportPilot Deterministic RAG Evaluation",
+  "retrieval_provider": "local-fastembed",
+  "retrieval_model": "BAAI/bge-small-en-v1.5::repeat4-1536",
+  "retrieval_dimensions": 1536,
+  "thresholds": {
+    "retrieval_top_1": 0.9,
+    "retrieval_top_3": 0.95,
+    "evidence_decision": 1.0,
+    "grounding_contract": 1.0
+  },
+  "metrics": {
+    "retrieval_cases": 12,
+    "retrieval_top_1_passes": 11,
+    "retrieval_top_1_accuracy": 0.9166666666666666,
+    "retrieval_top_3_passes": 12,
+    "retrieval_top_3_accuracy": 1.0,
+    "decision_cases": 6,
+    "decision_passes": 6,
+    "decision_accuracy": 1.0,
+    "grounding_cases": 4,
+    "grounding_passes": 4,
+    "grounding_accuracy": 1.0,
+    "total_cases": 22
+  },
+  "gates": {
+    "retrieval_top_1": true,
+    "retrieval_top_3": true,
+    "evidence_decision": true,
+    "grounding_contract": true
+  },
+  "overall_pass": true,
+  "baseline_coverage": {
+    "covered_in_m3": [
+      "B-02",
+      "B-05",
+      "B-06",
+      "B-08"
+    ],
+    "deferred_to_m4": [
+      "B-01",
+      "B-03",
+      "B-07"
+    ],
+    "deferred_to_m6_adversarial": [
+      "B-04"
+    ]
+  },
+  "retrieval_results": [
+    {
+      "id": "R-01",
+      "baseline_id": "B-02",
+      "question": "Can I return my unused backpack after 18 days?",
+      "expected_source": "Returns Policy",
+      "returned_sources": [
+        "Returns Policy",
+        "Northstar Product Support Facts",
+        "Exchange Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.697056723342723,
+      "expected_source_similarity": 0.697056723342723
+    },
+    {
+      "id": "R-02",
+      "baseline_id": null,
+      "question": "How many days do I have to send back an unused purchase?",
+      "expected_source": "Returns Policy",
+      "returned_sources": [
+        "Returns Policy",
+        "Exchange Policy",
+        "Standard Shipping Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.755001841783084,
+      "expected_source_similarity": 0.755001841783084
+    },
+    {
+      "id": "R-03",
+      "baseline_id": "B-05",
+      "question": "My lantern arrived broken. What information do you need from me?",
+      "expected_source": "Damaged Items Policy",
+      "returned_sources": [
+        "Northstar Product Support Facts",
+        "Damaged Items Policy",
+        "Northstar Product Support Facts"
+      ],
+      "top_1_match": false,
+      "top_3_match": true,
+      "top_similarity": 0.652687031350979,
+      "expected_source_similarity": 0.56390947103502
+    },
+    {
+      "id": "R-04",
+      "baseline_id": null,
+      "question": "The product was damaged when it was delivered. What should I do?",
+      "expected_source": "Damaged Items Policy",
+      "returned_sources": [
+        "Damaged Items Policy",
+        "Standard Shipping Policy",
+        "Product Warranty Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.615850673216505,
+      "expected_source_similarity": 0.615850673216505
+    },
+    {
+      "id": "R-05",
+      "baseline_id": "B-06",
+      "question": "Is TrailPack waterproof?",
+      "expected_source": "Northstar Product Support Facts",
+      "returned_sources": [
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.800211405779291,
+      "expected_source_similarity": 0.800211405779291
+    },
+    {
+      "id": "R-06",
+      "baseline_id": null,
+      "question": "Can I put the Summit Flask in the dishwasher?",
+      "expected_source": "Northstar Product Support Facts",
+      "returned_sources": [
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.892369781105472,
+      "expected_source_similarity": 0.892369781105472
+    },
+    {
+      "id": "R-07",
+      "baseline_id": null,
+      "question": "Can I replace the CampGlow Lantern battery myself?",
+      "expected_source": "Northstar Product Support Facts",
+      "returned_sources": [
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.791646957397461,
+      "expected_source_similarity": 0.791646957397461
+    },
+    {
+      "id": "R-08",
+      "baseline_id": null,
+      "question": "How should I wash the Packing Cube Set?",
+      "expected_source": "Northstar Product Support Facts",
+      "returned_sources": [
+        "Northstar Product Support Facts",
+        "Northstar Product Support Facts",
+        "Damaged Items Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.711762968757421,
+      "expected_source_similarity": 0.711762968757421
+    },
+    {
+      "id": "R-09",
+      "baseline_id": null,
+      "question": "How long does standard shipping usually take?",
+      "expected_source": "Standard Shipping Policy",
+      "returned_sources": [
+        "Standard Shipping Policy",
+        "Exchange Policy",
+        "Returns Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.834820528647837,
+      "expected_source_similarity": 0.834820528647837
+    },
+    {
+      "id": "R-10",
+      "baseline_id": null,
+      "question": "What is the normal delivery window for standard shipping?",
+      "expected_source": "Standard Shipping Policy",
+      "returned_sources": [
+        "Standard Shipping Policy",
+        "Returns Policy",
+        "Exchange Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.837227056191741,
+      "expected_source_similarity": 0.837227056191741
+    },
+    {
+      "id": "R-11",
+      "baseline_id": null,
+      "question": "Can I exchange an item instead of returning it?",
+      "expected_source": "Exchange Policy",
+      "returned_sources": [
+        "Exchange Policy",
+        "Returns Policy",
+        "Damaged Items Policy"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.692553343703154,
+      "expected_source_similarity": 0.692553343703154
+    },
+    {
+      "id": "R-12",
+      "baseline_id": null,
+      "question": "What does the product warranty cover?",
+      "expected_source": "Product Warranty Policy",
+      "returned_sources": [
+        "Product Warranty Policy",
+        "Returns Policy",
+        "Northstar Product Support Facts"
+      ],
+      "top_1_match": true,
+      "top_3_match": true,
+      "top_similarity": 0.756227084060945,
+      "expected_source_similarity": 0.756227084060945
+    }
+  ],
+  "decision_results": [
+    {
+      "id": "D-01",
+      "name": "missing evidence",
+      "baseline_id": null,
+      "passed": true,
+      "checks": {
+        "confidence_band": true,
+        "generation_allowed": true,
+        "contradiction": true,
+        "reason": true
+      },
+      "actual": {
+        "confidence": 0.0,
+        "confidence_band": "LOW",
+        "generation_allowed": false,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": [
+          "EVIDENCE_MISSING"
+        ]
+      }
+    },
+    {
+      "id": "D-02",
+      "name": "weak evidence",
+      "baseline_id": null,
+      "passed": true,
+      "checks": {
+        "confidence_band": true,
+        "generation_allowed": true,
+        "contradiction": true,
+        "reason": true
+      },
+      "actual": {
+        "confidence": 0.4,
+        "confidence_band": "LOW",
+        "generation_allowed": false,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": [
+          "EVIDENCE_WEAK"
+        ]
+      }
+    },
+    {
+      "id": "D-03",
+      "name": "medium evidence",
+      "baseline_id": null,
+      "passed": true,
+      "checks": {
+        "confidence_band": true,
+        "generation_allowed": true,
+        "contradiction": true,
+        "reason": true
+      },
+      "actual": {
+        "confidence": 0.64,
+        "confidence_band": "MEDIUM",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": [
+          "EVIDENCE_MEDIUM"
+        ]
+      }
+    },
+    {
+      "id": "D-04",
+      "name": "high evidence",
+      "baseline_id": null,
+      "passed": true,
+      "checks": {
+        "confidence_band": true,
+        "generation_allowed": true,
+        "contradiction": true,
+        "reason": true
+      },
+      "actual": {
+        "confidence": 0.86,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": [
+          "EVIDENCE_HIGH"
+        ]
+      }
+    },
+    {
+      "id": "D-05",
+      "name": "close competing sources",
+      "baseline_id": null,
+      "passed": true,
+      "checks": {
+        "confidence_band": true,
+        "generation_allowed": true,
+        "contradiction": true,
+        "reason": true
+      },
+      "actual": {
+        "confidence": 0.7299,
+        "confidence_band": "MEDIUM",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": true,
+        "reasons": [
+          "EVIDENCE_AMBIGUOUS",
+          "EVIDENCE_MEDIUM"
+        ]
+      }
+    },
+    {
+      "id": "D-06",
+      "name": "explicit contradictory policy claims",
+      "baseline_id": "B-08",
+      "passed": true,
+      "checks": {
+        "confidence_band": true,
+        "generation_allowed": true,
+        "contradiction": true,
+        "reason": true
+      },
+      "actual": {
+        "confidence": 0.5799,
+        "confidence_band": "LOW",
+        "generation_allowed": false,
+        "contradiction_detected": true,
+        "ambiguity_detected": false,
+        "reasons": [
+          "EVIDENCE_CONTRADICTORY",
+          "CONFLICTING_CLAIM:return_window_days"
+        ]
+      }
+    }
+  ],
+  "grounding_results": [
+    {
+      "id": "G-01",
+      "mode": "valid_answer",
+      "expected_outcome": "ACCEPTED",
+      "observed_outcome": "ACCEPTED",
+      "provider_calls": 1,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "G-02",
+      "mode": "answered_without_citation",
+      "expected_outcome": "REJECTED",
+      "observed_outcome": "REJECTED",
+      "provider_calls": 2,
+      "error": "An ANSWERED response must include at least one supporting citation_ref.",
+      "passed": true
+    },
+    {
+      "id": "G-03",
+      "mode": "unknown_citation",
+      "expected_outcome": "REJECTED",
+      "observed_outcome": "REJECTED",
+      "provider_calls": 2,
+      "error": "The response used unknown citation references: K999.",
+      "passed": true
+    },
+    {
+      "id": "G-04",
+      "mode": "valid_insufficient_evidence",
+      "expected_outcome": "ACCEPTED",
+      "observed_outcome": "ACCEPTED",
+      "provider_calls": 1,
+      "error": null,
+      "passed": true
+    }
+  ]
+}
