@@ -45,7 +45,10 @@ from app.services.support_ai import (
     TicketMessageNotFoundError,
     run_ticket_ai_draft,
 )
-
+from app.services.commerce import (
+    CommerceConfigurationError,
+    CommerceProviderError,
+)
 
 router = APIRouter(
     prefix="/api/v1/agent/tickets",
@@ -119,6 +122,7 @@ def create_ticket_ai_draft(
     except (
         EmbeddingConfigurationError,
         GenerationConfigurationError,
+        CommerceConfigurationError,
     ) as exc:
 
         raise HTTPException(
@@ -141,6 +145,7 @@ def create_ticket_ai_draft(
     except (
         EmbeddingProviderError,
         GenerationProviderError,
+        CommerceProviderError,
     ) as exc:
 
         raise HTTPException(

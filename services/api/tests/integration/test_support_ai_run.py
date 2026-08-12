@@ -46,6 +46,7 @@ MANAGER_ID = UUID(
 
 
 def fake_manager() -> InternalUser:
+
     return InternalUser(
         id=
             MANAGER_ID,
@@ -72,7 +73,11 @@ def basis_vector(
         )
     ]
 
-    vector[index] = 1.0
+
+    vector[
+        index
+    ] = 1.0
+
 
     return vector
 
@@ -84,8 +89,11 @@ def vector_literal(
     return (
         "["
         + ",".join(
-            str(value)
-            for value in vector
+            str(
+                value
+            )
+            for value
+            in vector
         )
         + "]"
     )
@@ -93,6 +101,7 @@ def vector_literal(
 
 @dataclass
 class FakeEmbeddingProvider:
+
     provider_name: str = (
         "decision-test"
     )
@@ -127,12 +136,14 @@ class FakeEmbeddingProvider:
                 for _ in texts
             ],
 
-            prompt_tokens=0,
+            prompt_tokens=
+                0,
         )
 
 
 @dataclass
 class FakeGenerationProvider:
+
     provider_name: str = (
         "generation-test"
     )
@@ -166,9 +177,14 @@ class FakeGenerationProvider:
                     ],
                 ),
 
-            input_tokens=100,
-            output_tokens=20,
-            generation_ms=10.0,
+            input_tokens=
+                100,
+
+            output_tokens=
+                20,
+
+            generation_ms=
+                10.0,
         )
 
 
@@ -200,10 +216,12 @@ def cleanup(
                     ),
                 )
 
+
                 cursor.execute(
                     """
                     delete
                     from public.tickets
+
                     where id = %s;
                     """,
                     (
@@ -229,6 +247,7 @@ def cleanup(
                     ),
                 )
 
+
                 cursor.execute(
                     """
                     delete
@@ -249,6 +268,7 @@ def test_ai_run_persists_grounding_and_evidence(
     embedding_provider = (
         FakeEmbeddingProvider()
     )
+
 
     generation_provider = (
         FakeGenerationProvider()
@@ -287,6 +307,10 @@ def test_ai_run_persists_grounding_and_evidence(
 
 
     try:
+
+        # --------------------------------------------------
+        # Create one deterministic published policy source.
+        # --------------------------------------------------
 
         source_response = client.post(
             "/api/v1/agent/knowledge/sources",
@@ -332,8 +356,7 @@ def test_ai_run_persists_grounding_and_evidence(
 
 
         assert (
-            source_response
-            .status_code
+            source_response.status_code
             == 201
         )
 
@@ -346,6 +369,11 @@ def test_ai_run_persists_grounding_and_evidence(
         )
 
 
+        # --------------------------------------------------
+        # Publish the source so retrieval is allowed to use
+        # it.
+        # --------------------------------------------------
+
         publish_response = client.post(
             (
                 "/api/v1/agent/knowledge/sources/"
@@ -356,11 +384,18 @@ def test_ai_run_persists_grounding_and_evidence(
 
 
         assert (
-            publish_response
-            .status_code
+            publish_response.status_code
             == 200
         )
 
+
+        # --------------------------------------------------
+        # Install a deterministic embedding directly.
+        #
+        # The fake embedding provider also returns basis
+        # vector 0, so this source should rank with HIGH
+        # similarity.
+        # --------------------------------------------------
 
         with psycopg.connect(
             settings.database_url
@@ -407,6 +442,17 @@ def test_ai_run_persists_grounding_and_evidence(
                     ),
                 )
 
+
+        # --------------------------------------------------
+        # Create an inbound return-policy question.
+        #
+        # M4D should classify this as:
+        #
+        # intent = return
+        # commerce_required = false
+        #
+        # Therefore it should use the normal RAG path.
+        # --------------------------------------------------
 
         intake_response = client.post(
             "/api/v1/intake/messages",
@@ -455,8 +501,7 @@ def test_ai_run_persists_grounding_and_evidence(
 
 
         assert (
-            intake_response
-            .status_code
+            intake_response.status_code
             == 201
         )
 
@@ -472,12 +517,17 @@ def test_ai_run_persists_grounding_and_evidence(
             ]
         )
 
+
         message_id = (
             intake[
                 "message_id"
             ]
         )
 
+
+        # --------------------------------------------------
+        # Run unified support AI decisioning.
+        # --------------------------------------------------
 
         response = client.post(
             (
@@ -501,6 +551,10 @@ def test_ai_run_persists_grounding_and_evidence(
         )
 
 
+        # ==================================================
+        # Grounding / evidence assertions.
+        # ==================================================
+
         assert (
             result[
                 "confidence_band"
@@ -508,12 +562,6 @@ def test_ai_run_persists_grounding_and_evidence(
             == "HIGH"
         )
 
-        assert (
-            result[
-                "decision"
-            ]
-            == "REVIEW_REQUIRED"
-        )
 
         assert (
             result[
@@ -521,6 +569,7 @@ def test_ai_run_persists_grounding_and_evidence(
             ]
             is True
         )
+
 
         assert (
             result[
@@ -531,6 +580,7 @@ def test_ai_run_persists_grounding_and_evidence(
             == "ANSWERED"
         )
 
+
         assert (
             result[
                 "evidence_count"
@@ -538,8 +588,68 @@ def test_ai_run_persists_grounding_and_evidence(
             >= 1
         )
 
+
+        # ==================================================
+        # M4D classification assertions.
+        # ==================================================
+
         assert (
-            "COMMERCE_SAFETY_NOT_EVALUATED"
+            result[
+                "intent"
+            ]
+            == "return"
+        )
+
+
+        assert (
+            result[
+                "commerce_required"
+            ]
+            is False
+        )
+
+
+        # ==================================================
+        # M4D unified decision assertions.
+        #
+        # This is a safe grounded draft, but M4E has not yet
+        # authorized automatic sending.
+        # ==================================================
+
+        assert (
+            result[
+                "decision"
+            ]
+            == "REVIEW_REQUIRED"
+        )
+
+
+        assert (
+            result[
+                "safe_draft_ready"
+            ]
+            is True
+        )
+
+
+        assert (
+            "EVIDENCE_HIGH"
+            in result[
+                "decision_reasons"
+            ]
+        )
+
+
+        assert (
+            "SAFE_KNOWLEDGE_DRAFT"
+            in result[
+                "decision_reasons"
+            ]
+        )
+
+
+        assert (
+            "AUTO_SEND_NOT_EVALUATED"
             in result[
                 "decision_reasons"
             ]
@@ -559,13 +669,18 @@ def test_ai_run_persists_grounding_and_evidence(
 
             with connection.cursor() as cursor:
 
+                # ==========================================
+                # AI run persistence.
+                # ==========================================
+
                 cursor.execute(
                     """
                     select
                         confidence_band,
                         decision,
                         provider,
-                        model
+                        model,
+                        intent
 
                     from public.ai_runs
 
@@ -587,8 +702,13 @@ def test_ai_run_persists_grounding_and_evidence(
                     "REVIEW_REQUIRED",
                     "generation-test",
                     "generation-test-v1",
+                    "return",
                 )
 
+
+                # ==========================================
+                # Retrieval evidence persistence.
+                # ==========================================
 
                 cursor.execute(
                     """
@@ -617,6 +737,16 @@ def test_ai_run_persists_grounding_and_evidence(
                 )
 
 
+                # ==========================================
+                # M4D decision audit persistence.
+                #
+                # M3E previously used:
+                # AI_DRAFT_EVALUATED
+                #
+                # M4D now uses:
+                # SUPPORT_DECISION_EVALUATED
+                # ==========================================
+
                 cursor.execute(
                     """
                     select count(*)::int
@@ -629,7 +759,7 @@ def test_ai_run_persists_grounding_and_evidence(
                       and entity_id = %s
 
                       and event_type =
-                        'AI_DRAFT_EVALUATED';
+                        'SUPPORT_DECISION_EVALUATED';
                     """,
                     (
                         ai_run_id,
@@ -645,9 +775,46 @@ def test_ai_run_persists_grounding_and_evidence(
                 )
 
 
+                # ==========================================
+                # Ticket operational state must also reflect
+                # the unified decision.
+                # ==========================================
+
+                cursor.execute(
+                    """
+                    select
+                        status,
+                        intent,
+                        confidence_band,
+                        restricted_action
+
+                    from public.tickets
+
+                    where id = %s;
+                    """,
+                    (
+                        ticket_id,
+                    ),
+                )
+
+
+                ticket = (
+                    cursor.fetchone()
+                )
+
+
+                assert ticket == (
+                    "DRAFTED",
+                    "return",
+                    "HIGH",
+                    False,
+                )
+
+
     finally:
 
         app.dependency_overrides.clear()
+
 
         cleanup(
             ticket_id=

@@ -3,6 +3,10 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from app.schemas.commerce import (
+    CommerceOrder,
+)
+
 from app.schemas.grounded_generation import (
     GroundedAnswerResponse,
 )
@@ -41,3 +45,19 @@ class TicketAIDraftResponse(BaseModel):
     generation_attempted: bool
 
     answer: GroundedAnswerResponse
+
+    # ------------------------------------------------------
+    # M4 unified decision context.
+    # ------------------------------------------------------
+
+    intent: str | None = None
+
+    commerce_required:bool = False
+
+    order_number: str | None = None
+
+    safe_draft_ready: bool = False
+
+    commerce_order: CommerceOrder | None = None
+
+    commerce_tool_call_id: UUID | None = None

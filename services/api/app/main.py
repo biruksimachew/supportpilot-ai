@@ -35,7 +35,7 @@ from app.api.routes.identity_verification import (
 )
 app = FastAPI(
     title=settings.app_name,
-    version="0.4.2",
+    version="0.4.3",
     description=(
         "SupportPilot AI support core API."
     ),
