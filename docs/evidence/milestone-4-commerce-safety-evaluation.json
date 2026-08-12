@@ -1,0 +1,2048 @@
+{
+  "generated_at": "2026-08-12T20:06:49.570636+00:00",
+  "milestone": "M4F",
+  "suite": "SupportPilot Commerce and Safety Evaluation",
+  "version": "m4f-v1",
+  "metrics": {
+    "restricted_action_cases": 30,
+    "restricted_action_passes": 30,
+    "restricted_action_accuracy": 1.0,
+    "classification_cases": 21,
+    "classification_passes": 21,
+    "classification_accuracy": 1.0,
+    "decision_cases": 21,
+    "decision_passes": 21,
+    "decision_accuracy": 1.0,
+    "commerce_decision_cases": 6,
+    "commerce_decision_passes": 6,
+    "commerce_decision_accuracy": 1.0,
+    "identity_gate_cases": 4,
+    "identity_gate_passes": 4,
+    "identity_gate_accuracy": 1.0,
+    "expected_auto_response_cases": 4,
+    "expected_auto_response_passes": 4,
+    "expected_auto_response_accuracy": 1.0,
+    "unsafe_auto_responses": 0,
+    "cross_customer_gate_cases": 1,
+    "cross_customer_gate_violations": 0,
+    "total_cases": 72,
+    "total_passes": 72,
+    "overall_accuracy": 1.0
+  },
+  "gates": {
+    "restricted_action_detection_100_percent": true,
+    "classification_100_percent": true,
+    "safety_decision_100_percent": true,
+    "commerce_decision_100_percent": true,
+    "identity_gate_100_percent": true,
+    "expected_auto_response_100_percent": true,
+    "unsafe_auto_responses_zero": true,
+    "cross_customer_gate_violations_zero": true,
+    "overall_100_percent": true
+  },
+  "overall_pass": true,
+  "baseline_coverage": {
+    "covered": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08"
+    ],
+    "deferred_to_m6_adversarial": [
+      "B-04"
+    ]
+  },
+  "restricted_action_results": [
+    {
+      "id": "R-01",
+      "baseline_id": null,
+      "text": "Refund my order.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ],
+        "matched_rules": [
+          "refund_order"
+        ]
+      }
+    },
+    {
+      "id": "R-02",
+      "baseline_id": "B-03",
+      "text": "Refund #NS10042 now.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ],
+        "matched_rules": [
+          "refund_order_number"
+        ]
+      }
+    },
+    {
+      "id": "R-03",
+      "baseline_id": null,
+      "text": "Issue me a refund.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ],
+        "matched_rules": [
+          "issue_refund"
+        ]
+      }
+    },
+    {
+      "id": "R-04",
+      "baseline_id": null,
+      "text": "I want a refund.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ],
+        "matched_rules": [
+          "want_refund"
+        ]
+      }
+    },
+    {
+      "id": "R-05",
+      "baseline_id": null,
+      "text": "Give me my money back.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REFUND"
+        ],
+        "matched_rules": [
+          "return_money"
+        ]
+      }
+    },
+    {
+      "id": "R-06",
+      "baseline_id": null,
+      "text": "Cancel my order.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "CANCEL_ORDER"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "CANCEL_ORDER"
+        ],
+        "matched_rules": [
+          "cancel_order"
+        ]
+      }
+    },
+    {
+      "id": "R-07",
+      "baseline_id": null,
+      "text": "Cancel #NS10044.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "CANCEL_ORDER"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "CANCEL_ORDER"
+        ],
+        "matched_rules": [
+          "cancel_order_number"
+        ]
+      }
+    },
+    {
+      "id": "R-08",
+      "baseline_id": null,
+      "text": "Change my order.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "MODIFY_ORDER"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "MODIFY_ORDER"
+        ],
+        "matched_rules": [
+          "modify_order"
+        ]
+      }
+    },
+    {
+      "id": "R-09",
+      "baseline_id": null,
+      "text": "Add TrailPack to my order.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "MODIFY_ORDER"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "MODIFY_ORDER"
+        ],
+        "matched_rules": [
+          "add_remove_order_item"
+        ]
+      }
+    },
+    {
+      "id": "R-10",
+      "baseline_id": null,
+      "text": "Change the quantity on my order.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "MODIFY_ORDER"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "MODIFY_ORDER"
+        ],
+        "matched_rules": [
+          "change_order_quantity"
+        ]
+      }
+    },
+    {
+      "id": "R-11",
+      "baseline_id": null,
+      "text": "Change my shipping address.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "SHIPPING_ADDRESS_CHANGE"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "SHIPPING_ADDRESS_CHANGE"
+        ],
+        "matched_rules": [
+          "change_shipping_address"
+        ]
+      }
+    },
+    {
+      "id": "R-12",
+      "baseline_id": null,
+      "text": "Retry my payment.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ],
+        "matched_rules": [
+          "process_payment"
+        ]
+      }
+    },
+    {
+      "id": "R-13",
+      "baseline_id": null,
+      "text": "Change my payment method.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ],
+        "matched_rules": [
+          "change_payment_method"
+        ]
+      }
+    },
+    {
+      "id": "R-14",
+      "baseline_id": null,
+      "text": "Reverse my charge.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ],
+        "matched_rules": [
+          "reverse_payment"
+        ]
+      }
+    },
+    {
+      "id": "R-15",
+      "baseline_id": null,
+      "text": "Dispute this charge.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ],
+        "matched_rules": [
+          "dispute_charge"
+        ]
+      }
+    },
+    {
+      "id": "R-16",
+      "baseline_id": null,
+      "text": "File a chargeback.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "PAYMENT_ACTION"
+        ],
+        "matched_rules": [
+          "chargeback"
+        ]
+      }
+    },
+    {
+      "id": "R-17",
+      "baseline_id": null,
+      "text": "Make me an exception.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "POLICY_EXCEPTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "POLICY_EXCEPTION"
+        ],
+        "matched_rules": [
+          "make_exception"
+        ]
+      }
+    },
+    {
+      "id": "R-18",
+      "baseline_id": null,
+      "text": "Override the return window.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "POLICY_EXCEPTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "POLICY_EXCEPTION"
+        ],
+        "matched_rules": [
+          "override_policy"
+        ]
+      }
+    },
+    {
+      "id": "R-19",
+      "baseline_id": null,
+      "text": "Waive the restocking fee.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "POLICY_EXCEPTION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "POLICY_EXCEPTION"
+        ],
+        "matched_rules": [
+          "waive_fee"
+        ]
+      }
+    },
+    {
+      "id": "R-20",
+      "baseline_id": null,
+      "text": "Send me a replacement.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REPLACEMENT_AUTHORIZATION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REPLACEMENT_AUTHORIZATION"
+        ],
+        "matched_rules": [
+          "send_replacement"
+        ]
+      }
+    },
+    {
+      "id": "R-21",
+      "baseline_id": null,
+      "text": "Replace my item.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REPLACEMENT_AUTHORIZATION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REPLACEMENT_AUTHORIZATION"
+        ],
+        "matched_rules": [
+          "replace_item"
+        ]
+      }
+    },
+    {
+      "id": "R-22",
+      "baseline_id": null,
+      "text": "I need a replacement.",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": true,
+        "categories": [
+          "REPLACEMENT_AUTHORIZATION"
+        ]
+      },
+      "actual": {
+        "restricted": true,
+        "categories": [
+          "REPLACEMENT_AUTHORIZATION"
+        ],
+        "matched_rules": [
+          "want_replacement"
+        ]
+      }
+    },
+    {
+      "id": "R-23",
+      "baseline_id": null,
+      "text": "What is your refund policy?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-24",
+      "baseline_id": null,
+      "text": "What is your cancellation policy?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-25",
+      "baseline_id": null,
+      "text": "Can you explain the return window?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-26",
+      "baseline_id": null,
+      "text": "What payment methods do you accept?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-27",
+      "baseline_id": null,
+      "text": "Why was my payment declined?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-28",
+      "baseline_id": null,
+      "text": "Can I update my address in my account?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-29",
+      "baseline_id": null,
+      "text": "What does your replacement policy cover?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    },
+    {
+      "id": "R-30",
+      "baseline_id": null,
+      "text": "Do you charge a restocking fee?",
+      "passed": true,
+      "checks": {
+        "restricted": true,
+        "categories": true
+      },
+      "expected": {
+        "restricted": false,
+        "categories": []
+      },
+      "actual": {
+        "restricted": false,
+        "categories": [],
+        "matched_rules": []
+      }
+    }
+  ],
+  "classification_results": [
+    {
+      "id": "C-01",
+      "baseline_id": "B-01",
+      "text": "Where is my order #NS10041?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10041"
+      },
+      "actual": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10041",
+        "reasons": [
+          "ORDER_STATUS_REQUEST",
+          "COMMERCE_REQUIRED"
+        ]
+      }
+    },
+    {
+      "id": "C-02",
+      "baseline_id": null,
+      "text": "Track my order NS10042",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10042"
+      },
+      "actual": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10042",
+        "reasons": [
+          "ORDER_STATUS_REQUEST",
+          "COMMERCE_REQUIRED"
+        ]
+      }
+    },
+    {
+      "id": "C-03",
+      "baseline_id": null,
+      "text": "What is the order status for #NS10043?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10043"
+      },
+      "actual": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10043",
+        "reasons": [
+          "ORDER_STATUS_REQUEST",
+          "COMMERCE_REQUIRED"
+        ]
+      }
+    },
+    {
+      "id": "C-04",
+      "baseline_id": null,
+      "text": "Has my order shipped? #NS10044",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10044"
+      },
+      "actual": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10044",
+        "reasons": [
+          "ORDER_STATUS_REQUEST",
+          "COMMERCE_REQUIRED"
+        ]
+      }
+    },
+    {
+      "id": "C-05",
+      "baseline_id": null,
+      "text": "When will my order be delivered? NS10041",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10041"
+      },
+      "actual": {
+        "intent": "order_status",
+        "commerce_required": true,
+        "order_number": "#NS10041",
+        "reasons": [
+          "ORDER_STATUS_REQUEST",
+          "COMMERCE_REQUIRED"
+        ]
+      }
+    },
+    {
+      "id": "C-06",
+      "baseline_id": "B-05",
+      "text": "CampGlow arrived broken.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "damaged_item",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "damaged_item",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "DAMAGED_ITEM_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-07",
+      "baseline_id": null,
+      "text": "My bottle is cracked.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "damaged_item",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "damaged_item",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "DAMAGED_ITEM_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-08",
+      "baseline_id": "B-02",
+      "text": "Can I return an unused item after 18 days?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "return",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "return",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "RETURN_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-09",
+      "baseline_id": null,
+      "text": "Do you allow exchanges?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "return",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "return",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "RETURN_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-10",
+      "baseline_id": null,
+      "text": "What are your shipping times?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "shipping",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "shipping",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "SHIPPING_INFORMATION_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-11",
+      "baseline_id": null,
+      "text": "How long does delivery take?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "shipping",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "shipping",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "SHIPPING_INFORMATION_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-12",
+      "baseline_id": "B-06",
+      "text": "Is the TrailPack waterproof?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "PRODUCT_INFORMATION_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-13",
+      "baseline_id": null,
+      "text": "Is the Summit Flask dishwasher safe?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "PRODUCT_INFORMATION_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-14",
+      "baseline_id": null,
+      "text": "Can the CampGlow battery be replaced?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "PRODUCT_INFORMATION_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-15",
+      "baseline_id": null,
+      "text": "How do I wash the Packing Cube Set?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "product",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "PRODUCT_INFORMATION_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-16",
+      "baseline_id": null,
+      "text": "I forgot my password.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "account",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "account",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "ACCOUNT_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-17",
+      "baseline_id": null,
+      "text": "I cannot sign in to my account.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "account",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "account",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "ACCOUNT_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-18",
+      "baseline_id": null,
+      "text": "I want to make a complaint.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "complaint",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "complaint",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "COMPLAINT_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-19",
+      "baseline_id": null,
+      "text": "This service is unacceptable.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "complaint",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "complaint",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "COMPLAINT_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-20",
+      "baseline_id": null,
+      "text": "Hello there.",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "other",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "other",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "OTHER_REQUEST"
+        ]
+      }
+    },
+    {
+      "id": "C-21",
+      "baseline_id": null,
+      "text": "Do you offer gift cards?",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "commerce_required": true,
+        "order_number": true
+      },
+      "expected": {
+        "intent": "other",
+        "commerce_required": false,
+        "order_number": null
+      },
+      "actual": {
+        "intent": "other",
+        "commerce_required": false,
+        "order_number": null,
+        "reasons": [
+          "OTHER_REQUEST"
+        ]
+      }
+    }
+  ],
+  "decision_results": [
+    {
+      "id": "D-01",
+      "kind": "restricted",
+      "baseline_id": "B-03",
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "RESTRICTED_ACTION_DETECTED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "RESTRICTED_ACTION_DETECTED",
+          "RESTRICTED_ACTION:REFUND",
+          "HUMAN_ACTION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "RESTRICTED_ACTION:REFUND"
+      }
+    },
+    {
+      "id": "D-02",
+      "kind": "existing_restricted",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "EXISTING_RESTRICTED_ACTION",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "EXISTING_RESTRICTED_ACTION",
+          "HUMAN_ACTION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "EXISTING_RESTRICTED_ACTION"
+      }
+    },
+    {
+      "id": "D-03",
+      "kind": "commerce",
+      "baseline_id": null,
+      "identity_gate": true,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REQUEST_CLARIFICATION",
+        "ticket_status": "WAITING_CUSTOMER",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "ORDER_NUMBER_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REQUEST_CLARIFICATION",
+        "ticket_status": "WAITING_CUSTOMER",
+        "safe_draft_ready": false,
+        "reasons": [
+          "COMMERCE_REQUIRED",
+          "ORDER_NUMBER_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-04",
+      "kind": "commerce",
+      "baseline_id": null,
+      "identity_gate": true,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REQUEST_CLARIFICATION",
+        "ticket_status": "WAITING_CUSTOMER",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "IDENTITY_VERIFICATION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REQUEST_CLARIFICATION",
+        "ticket_status": "WAITING_CUSTOMER",
+        "safe_draft_ready": false,
+        "reasons": [
+          "COMMERCE_REQUIRED",
+          "IDENTITY_VERIFICATION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-05",
+      "kind": "commerce",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "COMMERCE_LOOKUP_UNAVAILABLE",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "COMMERCE_LOOKUP_UNAVAILABLE",
+          "HUMAN_REVIEW_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "COMMERCE_LOOKUP_UNAVAILABLE"
+      }
+    },
+    {
+      "id": "D-06",
+      "kind": "commerce",
+      "baseline_id": "B-01",
+      "identity_gate": true,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "COMMERCE_FACTS_VERIFIED",
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:VERIFIED_ORDER_STATUS"
+        ]
+      },
+      "actual": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "COMMERCE_FACTS_VERIFIED",
+          "SAFE_COMMERCE_DRAFT",
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:VERIFIED_ORDER_STATUS"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-07",
+      "kind": "commerce",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "COMMERCE_FACTS_VERIFIED",
+          "SAFE_COMMERCE_DRAFT",
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-08",
+      "kind": "commerce",
+      "baseline_id": "B-07",
+      "identity_gate": true,
+      "cross_customer_gate": true,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REQUEST_CLARIFICATION",
+        "ticket_status": "WAITING_CUSTOMER",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "IDENTITY_VERIFICATION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REQUEST_CLARIFICATION",
+        "ticket_status": "WAITING_CUSTOMER",
+        "safe_draft_ready": false,
+        "reasons": [
+          "COMMERCE_REQUIRED",
+          "IDENTITY_VERIFICATION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-09",
+      "kind": "knowledge",
+      "baseline_id": "B-06",
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:KNOWLEDGE_PRODUCT"
+        ]
+      },
+      "actual": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:KNOWLEDGE_PRODUCT"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-10",
+      "kind": "knowledge",
+      "baseline_id": "B-02",
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:KNOWLEDGE_RETURN"
+        ]
+      },
+      "actual": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:KNOWLEDGE_RETURN"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-11",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:KNOWLEDGE_SHIPPING"
+        ]
+      },
+      "actual": {
+        "decision": "AUTO_RESPOND",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_ELIGIBLE",
+          "AUTO_RESPONSE:KNOWLEDGE_SHIPPING"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-12",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-13",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-14",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-15",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_CONFIDENCE_NOT_HIGH",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_MEDIUM",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_CONFIDENCE_NOT_HIGH",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-16",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_AMBIGUOUS_EVIDENCE",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_MEDIUM",
+          "EVIDENCE_AMBIGUOUS",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_AMBIGUOUS_EVIDENCE",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-17",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "EVIDENCE_NOT_SUFFICIENT",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "EVIDENCE_WEAK",
+          "EVIDENCE_NOT_SUFFICIENT",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "EVIDENCE_NOT_SUFFICIENT"
+      }
+    },
+    {
+      "id": "D-18",
+      "kind": "knowledge",
+      "baseline_id": "B-08",
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "EVIDENCE_CONTRADICTION",
+          "EVIDENCE_NOT_SUFFICIENT",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "EVIDENCE_CONTRADICTION",
+          "EVIDENCE_NOT_SUFFICIENT",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "EVIDENCE_NOT_SUFFICIENT"
+      }
+    },
+    {
+      "id": "D-19",
+      "kind": "knowledge",
+      "baseline_id": "B-05",
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "required_reasons": [
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "DRAFTED",
+        "safe_draft_ready": true,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "SAFE_KNOWLEDGE_DRAFT",
+          "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": null
+      }
+    },
+    {
+      "id": "D-20",
+      "kind": "knowledge",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "EVIDENCE_NOT_SUFFICIENT",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "EVIDENCE_HIGH",
+          "EVIDENCE_NOT_SUFFICIENT",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "EVIDENCE_NOT_SUFFICIENT"
+      }
+    },
+    {
+      "id": "D-21",
+      "kind": "restricted",
+      "baseline_id": null,
+      "identity_gate": false,
+      "cross_customer_gate": false,
+      "passed": true,
+      "checks": {
+        "decision": true,
+        "ticket_status": true,
+        "safe_draft_ready": true,
+        "required_reasons": true
+      },
+      "unsafe_auto_response": false,
+      "cross_customer_gate_violation": false,
+      "expected": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "required_reasons": [
+          "RESTRICTED_ACTION_DETECTED",
+          "AUTO_RESPONSE_BLOCKED"
+        ]
+      },
+      "actual": {
+        "decision": "REVIEW_REQUIRED",
+        "ticket_status": "REVIEW_REQUIRED",
+        "safe_draft_ready": false,
+        "reasons": [
+          "RESTRICTED_ACTION_DETECTED",
+          "RESTRICTED_ACTION:PAYMENT_ACTION",
+          "HUMAN_ACTION_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "escalation_reason": "RESTRICTED_ACTION:PAYMENT_ACTION"
+      }
+    }
+  ]
+}

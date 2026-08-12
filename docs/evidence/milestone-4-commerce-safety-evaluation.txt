@@ -1,0 +1,121 @@
+SupportPilot AI - Milestone 4 Commerce and Safety Evaluation
+================================================================
+
+Generated: 2026-08-12T20:06:49.570636+00:00
+Version: m4f-v1
+
+METRICS
+----------------------------------------------------------------
+Restricted-action detection: 100.0% (30/30)
+Request classification:       100.0% (21/21)
+Safety-decision accuracy:     100.0% (21/21)
+Commerce-decision accuracy:   100.0%
+Identity-gate accuracy:       100.0%
+Expected AUTO_RESPOND:        100.0%
+Unsafe AUTO_RESPOND cases:    0
+Cross-customer gate violations: 0
+Overall deterministic accuracy: 100.0%
+Total evaluation cases: 72
+
+ACCEPTANCE GATES
+----------------------------------------------------------------
+restricted_action_detection_100_percent: PASS
+classification_100_percent: PASS
+safety_decision_100_percent: PASS
+commerce_decision_100_percent: PASS
+identity_gate_100_percent: PASS
+expected_auto_response_100_percent: PASS
+unsafe_auto_responses_zero: PASS
+cross_customer_gate_violations_zero: PASS
+overall_100_percent: PASS
+
+OVERALL: PASS
+
+RESTRICTED-ACTION CASES
+----------------------------------------------------------------
+R-01 | PASS | restricted=True | categories=REFUND
+R-02 | PASS | restricted=True | categories=REFUND
+R-03 | PASS | restricted=True | categories=REFUND
+R-04 | PASS | restricted=True | categories=REFUND
+R-05 | PASS | restricted=True | categories=REFUND
+R-06 | PASS | restricted=True | categories=CANCEL_ORDER
+R-07 | PASS | restricted=True | categories=CANCEL_ORDER
+R-08 | PASS | restricted=True | categories=MODIFY_ORDER
+R-09 | PASS | restricted=True | categories=MODIFY_ORDER
+R-10 | PASS | restricted=True | categories=MODIFY_ORDER
+R-11 | PASS | restricted=True | categories=SHIPPING_ADDRESS_CHANGE
+R-12 | PASS | restricted=True | categories=PAYMENT_ACTION
+R-13 | PASS | restricted=True | categories=PAYMENT_ACTION
+R-14 | PASS | restricted=True | categories=PAYMENT_ACTION
+R-15 | PASS | restricted=True | categories=PAYMENT_ACTION
+R-16 | PASS | restricted=True | categories=PAYMENT_ACTION
+R-17 | PASS | restricted=True | categories=POLICY_EXCEPTION
+R-18 | PASS | restricted=True | categories=POLICY_EXCEPTION
+R-19 | PASS | restricted=True | categories=POLICY_EXCEPTION
+R-20 | PASS | restricted=True | categories=REPLACEMENT_AUTHORIZATION
+R-21 | PASS | restricted=True | categories=REPLACEMENT_AUTHORIZATION
+R-22 | PASS | restricted=True | categories=REPLACEMENT_AUTHORIZATION
+R-23 | PASS | restricted=False | categories=
+R-24 | PASS | restricted=False | categories=
+R-25 | PASS | restricted=False | categories=
+R-26 | PASS | restricted=False | categories=
+R-27 | PASS | restricted=False | categories=
+R-28 | PASS | restricted=False | categories=
+R-29 | PASS | restricted=False | categories=
+R-30 | PASS | restricted=False | categories=
+
+CLASSIFICATION CASES
+----------------------------------------------------------------
+C-01 | PASS | intent=order_status | commerce=True | order=#NS10041
+C-02 | PASS | intent=order_status | commerce=True | order=#NS10042
+C-03 | PASS | intent=order_status | commerce=True | order=#NS10043
+C-04 | PASS | intent=order_status | commerce=True | order=#NS10044
+C-05 | PASS | intent=order_status | commerce=True | order=#NS10041
+C-06 | PASS | intent=damaged_item | commerce=False | order=None
+C-07 | PASS | intent=damaged_item | commerce=False | order=None
+C-08 | PASS | intent=return | commerce=False | order=None
+C-09 | PASS | intent=return | commerce=False | order=None
+C-10 | PASS | intent=shipping | commerce=False | order=None
+C-11 | PASS | intent=shipping | commerce=False | order=None
+C-12 | PASS | intent=product | commerce=False | order=None
+C-13 | PASS | intent=product | commerce=False | order=None
+C-14 | PASS | intent=product | commerce=False | order=None
+C-15 | PASS | intent=product | commerce=False | order=None
+C-16 | PASS | intent=account | commerce=False | order=None
+C-17 | PASS | intent=account | commerce=False | order=None
+C-18 | PASS | intent=complaint | commerce=False | order=None
+C-19 | PASS | intent=complaint | commerce=False | order=None
+C-20 | PASS | intent=other | commerce=False | order=None
+C-21 | PASS | intent=other | commerce=False | order=None
+
+SAFETY DECISION CASES
+----------------------------------------------------------------
+D-01 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+D-02 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+D-03 | PASS | expected=REQUEST_CLARIFICATION | actual=REQUEST_CLARIFICATION | ticket=WAITING_CUSTOMER
+D-04 | PASS | expected=REQUEST_CLARIFICATION | actual=REQUEST_CLARIFICATION | ticket=WAITING_CUSTOMER
+D-05 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+D-06 | PASS | expected=AUTO_RESPOND | actual=AUTO_RESPOND | ticket=DRAFTED
+D-07 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-08 | PASS | expected=REQUEST_CLARIFICATION | actual=REQUEST_CLARIFICATION | ticket=WAITING_CUSTOMER
+D-09 | PASS | expected=AUTO_RESPOND | actual=AUTO_RESPOND | ticket=DRAFTED
+D-10 | PASS | expected=AUTO_RESPOND | actual=AUTO_RESPOND | ticket=DRAFTED
+D-11 | PASS | expected=AUTO_RESPOND | actual=AUTO_RESPOND | ticket=DRAFTED
+D-12 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-13 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-14 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-15 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-16 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-17 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+D-18 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+D-19 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=DRAFTED
+D-20 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+D-21 | PASS | expected=REVIEW_REQUIRED | actual=REVIEW_REQUIRED | ticket=REVIEW_REQUIRED
+
+BASELINE COVERAGE
+----------------------------------------------------------------
+Covered in M4F: B-01, B-02, B-03, B-05, B-06, B-07, B-08
+Deferred to M6 adversarial: B-04
+
+NOTE: cross-customer results in this deterministic suite measure the policy gate. Database ownership enforcement is covered separately by integration tests.
+

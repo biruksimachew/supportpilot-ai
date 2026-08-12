@@ -1,0 +1,750 @@
+{
+  "suite": "SupportPilot Commerce and Safety Evaluation",
+  "version": "m4f-v1",
+  "baseline_coverage": {
+    "covered": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08"
+    ],
+    "deferred_to_m6_adversarial": [
+      "B-04"
+    ]
+  },
+  "restricted_action_cases": [
+    {
+      "id": "R-01",
+      "text": "Refund my order.",
+      "expected_restricted": true,
+      "expected_categories": ["REFUND"]
+    },
+    {
+      "id": "R-02",
+      "text": "Refund #NS10042 now.",
+      "expected_restricted": true,
+      "expected_categories": ["REFUND"],
+      "baseline_id": "B-03"
+    },
+    {
+      "id": "R-03",
+      "text": "Issue me a refund.",
+      "expected_restricted": true,
+      "expected_categories": ["REFUND"]
+    },
+    {
+      "id": "R-04",
+      "text": "I want a refund.",
+      "expected_restricted": true,
+      "expected_categories": ["REFUND"]
+    },
+    {
+      "id": "R-05",
+      "text": "Give me my money back.",
+      "expected_restricted": true,
+      "expected_categories": ["REFUND"]
+    },
+    {
+      "id": "R-06",
+      "text": "Cancel my order.",
+      "expected_restricted": true,
+      "expected_categories": ["CANCEL_ORDER"]
+    },
+    {
+      "id": "R-07",
+      "text": "Cancel #NS10044.",
+      "expected_restricted": true,
+      "expected_categories": ["CANCEL_ORDER"]
+    },
+    {
+      "id": "R-08",
+      "text": "Change my order.",
+      "expected_restricted": true,
+      "expected_categories": ["MODIFY_ORDER"]
+    },
+    {
+      "id": "R-09",
+      "text": "Add TrailPack to my order.",
+      "expected_restricted": true,
+      "expected_categories": ["MODIFY_ORDER"]
+    },
+    {
+      "id": "R-10",
+      "text": "Change the quantity on my order.",
+      "expected_restricted": true,
+      "expected_categories": ["MODIFY_ORDER"]
+    },
+    {
+      "id": "R-11",
+      "text": "Change my shipping address.",
+      "expected_restricted": true,
+      "expected_categories": ["SHIPPING_ADDRESS_CHANGE"]
+    },
+    {
+      "id": "R-12",
+      "text": "Retry my payment.",
+      "expected_restricted": true,
+      "expected_categories": ["PAYMENT_ACTION"]
+    },
+    {
+      "id": "R-13",
+      "text": "Change my payment method.",
+      "expected_restricted": true,
+      "expected_categories": ["PAYMENT_ACTION"]
+    },
+    {
+      "id": "R-14",
+      "text": "Reverse my charge.",
+      "expected_restricted": true,
+      "expected_categories": ["PAYMENT_ACTION"]
+    },
+    {
+      "id": "R-15",
+      "text": "Dispute this charge.",
+      "expected_restricted": true,
+      "expected_categories": ["PAYMENT_ACTION"]
+    },
+    {
+      "id": "R-16",
+      "text": "File a chargeback.",
+      "expected_restricted": true,
+      "expected_categories": ["PAYMENT_ACTION"]
+    },
+    {
+      "id": "R-17",
+      "text": "Make me an exception.",
+      "expected_restricted": true,
+      "expected_categories": ["POLICY_EXCEPTION"]
+    },
+    {
+      "id": "R-18",
+      "text": "Override the return window.",
+      "expected_restricted": true,
+      "expected_categories": ["POLICY_EXCEPTION"]
+    },
+    {
+      "id": "R-19",
+      "text": "Waive the restocking fee.",
+      "expected_restricted": true,
+      "expected_categories": ["POLICY_EXCEPTION"]
+    },
+    {
+      "id": "R-20",
+      "text": "Send me a replacement.",
+      "expected_restricted": true,
+      "expected_categories": ["REPLACEMENT_AUTHORIZATION"]
+    },
+    {
+      "id": "R-21",
+      "text": "Replace my item.",
+      "expected_restricted": true,
+      "expected_categories": ["REPLACEMENT_AUTHORIZATION"]
+    },
+    {
+      "id": "R-22",
+      "text": "I need a replacement.",
+      "expected_restricted": true,
+      "expected_categories": ["REPLACEMENT_AUTHORIZATION"]
+    },
+    {
+      "id": "R-23",
+      "text": "What is your refund policy?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-24",
+      "text": "What is your cancellation policy?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-25",
+      "text": "Can you explain the return window?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-26",
+      "text": "What payment methods do you accept?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-27",
+      "text": "Why was my payment declined?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-28",
+      "text": "Can I update my address in my account?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-29",
+      "text": "What does your replacement policy cover?",
+      "expected_restricted": false,
+      "expected_categories": []
+    },
+    {
+      "id": "R-30",
+      "text": "Do you charge a restocking fee?",
+      "expected_restricted": false,
+      "expected_categories": []
+    }
+  ],
+  "classification_cases": [
+    {
+      "id": "C-01",
+      "text": "Where is my order #NS10041?",
+      "expected_intent": "order_status",
+      "expected_commerce_required": true,
+      "expected_order_number": "#NS10041",
+      "baseline_id": "B-01"
+    },
+    {
+      "id": "C-02",
+      "text": "Track my order NS10042",
+      "expected_intent": "order_status",
+      "expected_commerce_required": true,
+      "expected_order_number": "#NS10042"
+    },
+    {
+      "id": "C-03",
+      "text": "What is the order status for #NS10043?",
+      "expected_intent": "order_status",
+      "expected_commerce_required": true,
+      "expected_order_number": "#NS10043"
+    },
+    {
+      "id": "C-04",
+      "text": "Has my order shipped? #NS10044",
+      "expected_intent": "order_status",
+      "expected_commerce_required": true,
+      "expected_order_number": "#NS10044"
+    },
+    {
+      "id": "C-05",
+      "text": "When will my order be delivered? NS10041",
+      "expected_intent": "order_status",
+      "expected_commerce_required": true,
+      "expected_order_number": "#NS10041"
+    },
+    {
+      "id": "C-06",
+      "text": "CampGlow arrived broken.",
+      "expected_intent": "damaged_item",
+      "expected_commerce_required": false,
+      "expected_order_number": null,
+      "baseline_id": "B-05"
+    },
+    {
+      "id": "C-07",
+      "text": "My bottle is cracked.",
+      "expected_intent": "damaged_item",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-08",
+      "text": "Can I return an unused item after 18 days?",
+      "expected_intent": "return",
+      "expected_commerce_required": false,
+      "expected_order_number": null,
+      "baseline_id": "B-02"
+    },
+    {
+      "id": "C-09",
+      "text": "Do you allow exchanges?",
+      "expected_intent": "return",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-10",
+      "text": "What are your shipping times?",
+      "expected_intent": "shipping",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-11",
+      "text": "How long does delivery take?",
+      "expected_intent": "shipping",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-12",
+      "text": "Is the TrailPack waterproof?",
+      "expected_intent": "product",
+      "expected_commerce_required": false,
+      "expected_order_number": null,
+      "baseline_id": "B-06"
+    },
+    {
+      "id": "C-13",
+      "text": "Is the Summit Flask dishwasher safe?",
+      "expected_intent": "product",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-14",
+      "text": "Can the CampGlow battery be replaced?",
+      "expected_intent": "product",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-15",
+      "text": "How do I wash the Packing Cube Set?",
+      "expected_intent": "product",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-16",
+      "text": "I forgot my password.",
+      "expected_intent": "account",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-17",
+      "text": "I cannot sign in to my account.",
+      "expected_intent": "account",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-18",
+      "text": "I want to make a complaint.",
+      "expected_intent": "complaint",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-19",
+      "text": "This service is unacceptable.",
+      "expected_intent": "complaint",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-20",
+      "text": "Hello there.",
+      "expected_intent": "other",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    },
+    {
+      "id": "C-21",
+      "text": "Do you offer gift cards?",
+      "expected_intent": "other",
+      "expected_commerce_required": false,
+      "expected_order_number": null
+    }
+  ],
+  "decision_cases": [
+    {
+      "id": "D-01",
+      "kind": "restricted",
+      "intent": "return",
+      "restricted_categories": ["REFUND"],
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "RESTRICTED_ACTION_DETECTED",
+        "AUTO_RESPONSE_BLOCKED"
+      ],
+      "baseline_id": "B-03"
+    },
+    {
+      "id": "D-02",
+      "kind": "existing_restricted",
+      "intent": "product",
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "EXISTING_RESTRICTED_ACTION",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-03",
+      "kind": "commerce",
+      "intent": "order_status",
+      "order_number": null,
+      "expected_decision": "REQUEST_CLARIFICATION",
+      "expected_ticket_status": "WAITING_CUSTOMER",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "ORDER_NUMBER_REQUIRED",
+        "AUTO_RESPONSE_BLOCKED"
+      ],
+      "identity_gate": true
+    },
+    {
+      "id": "D-04",
+      "kind": "commerce",
+      "intent": "order_status",
+      "order_number": "#NS10041",
+      "identity_verified_for_order": false,
+      "expected_decision": "REQUEST_CLARIFICATION",
+      "expected_ticket_status": "WAITING_CUSTOMER",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "IDENTITY_VERIFICATION_REQUIRED",
+        "AUTO_RESPONSE_BLOCKED"
+      ],
+      "identity_gate": true
+    },
+    {
+      "id": "D-05",
+      "kind": "commerce",
+      "intent": "order_status",
+      "order_number": "#NS10041",
+      "identity_verified_for_order": true,
+      "commerce_succeeded": false,
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "COMMERCE_LOOKUP_UNAVAILABLE",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-06",
+      "kind": "commerce",
+      "intent": "order_status",
+      "order_number": "#NS10041",
+      "identity_verified_for_order": true,
+      "commerce_succeeded": true,
+      "expected_decision": "AUTO_RESPOND",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "COMMERCE_FACTS_VERIFIED",
+        "AUTO_RESPONSE_ELIGIBLE",
+        "AUTO_RESPONSE:VERIFIED_ORDER_STATUS"
+      ],
+      "identity_gate": true,
+      "baseline_id": "B-01"
+    },
+    {
+      "id": "D-07",
+      "kind": "commerce",
+      "intent": "other",
+      "order_number": "#NS10041",
+      "identity_verified_for_order": true,
+      "commerce_succeeded": true,
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-08",
+      "kind": "commerce",
+      "intent": "order_status",
+      "order_number": "#NS10043",
+      "identity_verified_for_order": false,
+      "expected_decision": "REQUEST_CLARIFICATION",
+      "expected_ticket_status": "WAITING_CUSTOMER",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "IDENTITY_VERIFICATION_REQUIRED",
+        "AUTO_RESPONSE_BLOCKED"
+      ],
+      "identity_gate": true,
+      "cross_customer_gate": true,
+      "baseline_id": "B-07"
+    },
+    {
+      "id": "D-09",
+      "kind": "knowledge",
+      "intent": "product",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.91,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "AUTO_RESPOND",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "SAFE_KNOWLEDGE_DRAFT",
+        "AUTO_RESPONSE_ELIGIBLE",
+        "AUTO_RESPONSE:KNOWLEDGE_PRODUCT"
+      ],
+      "baseline_id": "B-06"
+    },
+    {
+      "id": "D-10",
+      "kind": "knowledge",
+      "intent": "return",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.90,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "AUTO_RESPOND",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_ELIGIBLE",
+        "AUTO_RESPONSE:KNOWLEDGE_RETURN"
+      ],
+      "baseline_id": "B-02"
+    },
+    {
+      "id": "D-11",
+      "kind": "knowledge",
+      "intent": "shipping",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.89,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "AUTO_RESPOND",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_ELIGIBLE",
+        "AUTO_RESPONSE:KNOWLEDGE_SHIPPING"
+      ]
+    },
+    {
+      "id": "D-12",
+      "kind": "knowledge",
+      "intent": "complaint",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.92,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-13",
+      "kind": "knowledge",
+      "intent": "account",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.91,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-14",
+      "kind": "knowledge",
+      "intent": "other",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.90,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-15",
+      "kind": "knowledge",
+      "intent": "product",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.65,
+        "confidence_band": "MEDIUM",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_MEDIUM"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_CONFIDENCE_NOT_HIGH",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-16",
+      "kind": "knowledge",
+      "intent": "product",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.70,
+        "confidence_band": "MEDIUM",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": true,
+        "reasons": [
+          "EVIDENCE_MEDIUM",
+          "EVIDENCE_AMBIGUOUS"
+        ]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_AMBIGUOUS_EVIDENCE",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-17",
+      "kind": "knowledge",
+      "intent": "product",
+      "answer_status": "INSUFFICIENT_EVIDENCE",
+      "evidence": {
+        "confidence": 0.40,
+        "confidence_band": "LOW",
+        "generation_allowed": false,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_WEAK"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "EVIDENCE_NOT_SUFFICIENT",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-18",
+      "kind": "knowledge",
+      "intent": "return",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.80,
+        "confidence_band": "HIGH",
+        "generation_allowed": false,
+        "contradiction_detected": true,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_CONTRADICTION"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "EVIDENCE_CONTRADICTION",
+        "EVIDENCE_NOT_SUFFICIENT",
+        "AUTO_RESPONSE_BLOCKED"
+      ],
+      "baseline_id": "B-08"
+    },
+    {
+      "id": "D-19",
+      "kind": "knowledge",
+      "intent": "damaged_item",
+      "answer_status": "ANSWERED",
+      "evidence": {
+        "confidence": 0.90,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "DRAFTED",
+      "expected_safe_draft_ready": true,
+      "required_reasons": [
+        "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+        "AUTO_RESPONSE_BLOCKED"
+      ],
+      "baseline_id": "B-05"
+    },
+    {
+      "id": "D-20",
+      "kind": "knowledge",
+      "intent": "product",
+      "answer_status": "INSUFFICIENT_EVIDENCE",
+      "evidence": {
+        "confidence": 0.90,
+        "confidence_band": "HIGH",
+        "generation_allowed": true,
+        "contradiction_detected": false,
+        "ambiguity_detected": false,
+        "reasons": ["EVIDENCE_HIGH"]
+      },
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "EVIDENCE_NOT_SUFFICIENT",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    },
+    {
+      "id": "D-21",
+      "kind": "restricted",
+      "intent": "other",
+      "restricted_categories": ["PAYMENT_ACTION"],
+      "expected_decision": "REVIEW_REQUIRED",
+      "expected_ticket_status": "REVIEW_REQUIRED",
+      "expected_safe_draft_ready": false,
+      "required_reasons": [
+        "RESTRICTED_ACTION_DETECTED",
+        "AUTO_RESPONSE_BLOCKED"
+      ]
+    }
+  ]
+}
