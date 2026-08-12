@@ -3,7 +3,9 @@ from uuid import UUID
 
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
+
 from app.core.config import settings
+
 from app.core.database import (
     get_database_connection,
 )
@@ -41,9 +43,19 @@ from app.services.knowledge_retrieval import (
     retrieve_knowledge,
 )
 
+from app.services.restricted_actions import (
+    RestrictedActionDetection,
+    detect_restricted_action,
+)
+
 
 PROMPT_VERSION = (
     "grounded-v1+evidence-decision-v1"
+)
+
+
+RESTRICTED_ACTION_VERSION = (
+    "restricted-action-v1"
 )
 
 
@@ -60,7 +72,11 @@ def _load_message(
 ) -> str:
 
     with get_database_connection() as connection:
-        connection.row_factory = dict_row
+
+        connection.row_factory = (
+            dict_row
+        )
+
 
         with connection.cursor() as cursor:
 
@@ -86,12 +102,11 @@ def _load_message(
             )
 
 
-            row = (
-                cursor.fetchone()
-            )
+            row = cursor.fetchone()
 
 
     if row is None:
+
         raise TicketMessageNotFoundError(
             (
                 "Message was not found "
@@ -108,6 +123,7 @@ def _load_message(
 def _insufficient_answer(
     *,
     question: str,
+
     retrieval_provider: str,
     retrieval_model: str,
 ) -> GroundedAnswerResponse:
@@ -141,6 +157,344 @@ def _insufficient_answer(
     )
 
 
+def _restricted_action_answer(
+    *,
+    question: str,
+) -> GroundedAnswerResponse:
+
+    return GroundedAnswerResponse(
+        status=
+            "INSUFFICIENT_EVIDENCE",
+
+        question=
+            question,
+
+        answer=(
+            "This request requires human "
+            "review. No refund, cancellation, "
+            "order change, payment action, "
+            "policy exception, or replacement "
+            "action has been performed."
+        ),
+
+        citations=[],
+
+        generation_provider=None,
+        generation_model=None,
+
+        retrieval_provider=
+            "not-run",
+
+        retrieval_model=
+            RESTRICTED_ACTION_VERSION,
+
+        input_tokens=None,
+        output_tokens=None,
+        generation_ms=None,
+    )
+
+
+def _persist_restricted_ai_run(
+    *,
+    user: InternalUser,
+
+    ticket_id: UUID,
+    message_id: UUID,
+
+    detection:
+        RestrictedActionDetection,
+
+    reasons: list[str],
+
+    latency_ms: int,
+
+) -> UUID:
+
+    escalation_reason = (
+        "RESTRICTED_ACTION:"
+        + ",".join(
+            detection.categories
+        )
+    )
+
+
+    with get_database_connection() as connection:
+
+        connection.row_factory = (
+            dict_row
+        )
+
+
+        with connection.transaction():
+
+            with connection.cursor() as cursor:
+
+                # ------------------------------------------
+                # Persist the deterministic policy decision.
+                # ------------------------------------------
+
+                cursor.execute(
+                    """
+                    insert into public.ai_runs (
+                        ticket_id,
+                        message_id,
+
+                        provider,
+                        model,
+
+                        prompt_version,
+
+                        intent,
+
+                        confidence,
+                        confidence_band,
+
+                        decision,
+                        decision_reasons,
+
+                        latency_ms,
+                        error_code
+                    )
+
+                    values (
+                        %s,
+                        %s,
+
+                        'deterministic-policy',
+                        %s,
+
+                        %s,
+
+                        null,
+
+                        0.0,
+                        'LOW',
+
+                        'REVIEW_REQUIRED',
+                        %s,
+
+                        %s,
+                        null
+                    )
+
+                    returning id;
+                    """,
+                    (
+                        ticket_id,
+                        message_id,
+
+                        RESTRICTED_ACTION_VERSION,
+
+                        RESTRICTED_ACTION_VERSION,
+
+                        Jsonb(
+                            reasons
+                        ),
+
+                        latency_ms,
+                    ),
+                )
+
+
+                ai_run_id = (
+                    cursor.fetchone()[
+                        "id"
+                    ]
+                )
+
+
+                # ------------------------------------------
+                # Mark the ticket itself as restricted and
+                # force it into the human-review queue.
+                # ------------------------------------------
+
+                cursor.execute(
+                    """
+                    update public.tickets
+
+                    set
+                        restricted_action =
+                            true,
+
+                        status =
+                            'REVIEW_REQUIRED',
+
+                        escalation_reason =
+                            %s
+
+                    where id = %s;
+                    """,
+                    (
+                        escalation_reason,
+                        ticket_id,
+                    ),
+                )
+
+
+                # ------------------------------------------
+                # Preserve the same general AI-run audit
+                # event used by normal drafts.
+                # ------------------------------------------
+
+                cursor.execute(
+                    """
+                    insert into public.audit_events (
+                        actor_type,
+                        actor_id,
+
+                        event_type,
+
+                        entity_type,
+                        entity_id,
+
+                        metadata
+                    )
+
+                    values (
+                        'AI',
+                        %s,
+
+                        'AI_DRAFT_EVALUATED',
+
+                        'ai_run',
+                        %s,
+
+                        %s
+                    );
+                    """,
+                    (
+                        str(
+                            ai_run_id
+                        ),
+
+                        str(
+                            ai_run_id
+                        ),
+
+                        Jsonb(
+                            {
+                                "ticket_id":
+                                    str(
+                                        ticket_id
+                                    ),
+
+                                "message_id":
+                                    str(
+                                        message_id
+                                    ),
+
+                                "requested_by":
+                                    str(
+                                        user.id
+                                    ),
+
+                                "requested_by_role":
+                                    user.role,
+
+                                "decision":
+                                    (
+                                        "REVIEW_REQUIRED"
+                                    ),
+
+                                "restricted_action":
+                                    True,
+
+                                "restricted_categories":
+                                    list(
+                                        detection
+                                        .categories
+                                    ),
+
+                                "evidence_count":
+                                    0,
+
+                                "generation_attempted":
+                                    False,
+                            }
+                        ),
+                    ),
+                )
+
+
+                # ------------------------------------------
+                # Separate security-specific audit event.
+                #
+                # Deliberately does NOT persist the raw
+                # customer message.
+                # ------------------------------------------
+
+                cursor.execute(
+                    """
+                    insert into public.audit_events (
+                        actor_type,
+                        actor_id,
+
+                        event_type,
+
+                        entity_type,
+                        entity_id,
+
+                        metadata
+                    )
+
+                    values (
+                        'AI',
+                        %s,
+
+                        'RESTRICTED_ACTION_DETECTED',
+
+                        'ticket',
+                        %s,
+
+                        %s
+                    );
+                    """,
+                    (
+                        str(
+                            ai_run_id
+                        ),
+
+                        str(
+                            ticket_id
+                        ),
+
+                        Jsonb(
+                            {
+                                "ticket_id":
+                                    str(
+                                        ticket_id
+                                    ),
+
+                                "message_id":
+                                    str(
+                                        message_id
+                                    ),
+
+                                "ai_run_id":
+                                    str(
+                                        ai_run_id
+                                    ),
+
+                                "categories":
+                                    list(
+                                        detection
+                                        .categories
+                                    ),
+
+                                "matched_rules":
+                                    list(
+                                        detection
+                                        .matched_rules
+                                    ),
+                            }
+                        ),
+                    ),
+                )
+
+
+    return ai_run_id
+
+
 def _persist_ai_run(
     *,
     user: InternalUser,
@@ -165,10 +519,14 @@ def _persist_ai_run(
 ) -> UUID:
 
     with get_database_connection() as connection:
-        connection.row_factory = dict_row
+
+        connection.row_factory = (
+            dict_row
+        )
 
 
         with connection.transaction():
+
             with connection.cursor() as cursor:
 
                 cursor.execute(
@@ -193,6 +551,7 @@ def _persist_ai_run(
                         latency_ms,
                         error_code
                     )
+
                     values (
                         %s,
                         %s,
@@ -252,7 +611,10 @@ def _persist_ai_run(
                 )
 
 
-                for rank, evidence in enumerate(
+                for (
+                    rank,
+                    evidence,
+                ) in enumerate(
                     retrieval.results,
                     start=1,
                 ):
@@ -360,7 +722,7 @@ def _persist_ai_run(
                                     .contradiction_detected,
                             }
                         ),
-                    )
+                    ),
                 )
 
 
@@ -388,10 +750,129 @@ def run_ticket_ai_draft(
 
 
     question = _load_message(
-        ticket_id=ticket_id,
-        message_id=message_id,
+        ticket_id=
+            ticket_id,
+
+        message_id=
+            message_id,
     ).strip()
 
+
+    # ======================================================
+    # M4C PRE-GENERATION SAFETY GATE
+    #
+    # This runs BEFORE:
+    # - semantic retrieval
+    # - Ollama generation
+    # - any future commerce operation
+    # ======================================================
+
+    restricted_detection = (
+        detect_restricted_action(
+            question
+        )
+    )
+
+
+    if restricted_detection.restricted:
+
+        reasons = [
+            "RESTRICTED_ACTION_DETECTED",
+
+            *[
+                (
+                    "RESTRICTED_ACTION:"
+                    + category
+                )
+
+                for category
+                in restricted_detection
+                .categories
+            ],
+
+            "HUMAN_ACTION_REQUIRED",
+            "AUTO_RESPONSE_BLOCKED",
+        ]
+
+
+        latency_ms = max(
+            0,
+
+            round(
+                (
+                    perf_counter()
+                    - started_at
+                )
+                * 1000
+            ),
+        )
+
+
+        ai_run_id = (
+            _persist_restricted_ai_run(
+                user=
+                    user,
+
+                ticket_id=
+                    ticket_id,
+
+                message_id=
+                    message_id,
+
+                detection=
+                    restricted_detection,
+
+                reasons=
+                    reasons,
+
+                latency_ms=
+                    latency_ms,
+            )
+        )
+
+
+        return TicketAIDraftResponse(
+            ai_run_id=
+                ai_run_id,
+
+            ticket_id=
+                ticket_id,
+
+            message_id=
+                message_id,
+
+            confidence=
+                0.0,
+
+            confidence_band=
+                "LOW",
+
+            decision=
+                "REVIEW_REQUIRED",
+
+            decision_reasons=
+                reasons,
+
+            evidence_count=
+                0,
+
+            contradiction_detected=
+                False,
+
+            generation_attempted=
+                False,
+
+            answer=
+                _restricted_action_answer(
+                    question=
+                        question
+                ),
+        )
+
+
+    # ======================================================
+    # NORMAL NON-RESTRICTED RAG PIPELINE
+    # ======================================================
 
     retrieval = retrieve_knowledge(
         question=
@@ -416,11 +897,10 @@ def run_ticket_ai_draft(
     generation_attempted = False
 
 
-    if (
-        assessment
-        .generation_allowed
-    ):
+    if assessment.generation_allowed:
+
         generation_attempted = True
+
 
         answer = (
             generate_grounded_answer(
@@ -441,10 +921,12 @@ def run_ticket_ai_draft(
             ==
             "INSUFFICIENT_EVIDENCE"
         ):
+
             assessment = (
                 EvidenceAssessment(
                     confidence=min(
-                        assessment.confidence,
+                        assessment
+                        .confidence,
 
                         (
                             settings
@@ -453,9 +935,11 @@ def run_ticket_ai_draft(
                         ),
                     ),
 
-                    confidence_band="LOW",
+                    confidence_band=
+                        "LOW",
 
-                    generation_allowed=False,
+                    generation_allowed=
+                        False,
 
                     contradiction_detected=
                         assessment
@@ -466,7 +950,9 @@ def run_ticket_ai_draft(
                         .ambiguity_detected,
 
                     reasons=[
-                        *assessment.reasons,
+                        *assessment
+                        .reasons,
+
                         (
                             "GENERATION_DECLARED_"
                             "INSUFFICIENT_EVIDENCE"
@@ -475,7 +961,9 @@ def run_ticket_ai_draft(
                 )
             )
 
+
     else:
+
         answer = _insufficient_answer(
             question=
                 question,
@@ -488,14 +976,13 @@ def run_ticket_ai_draft(
         )
 
 
-    # --------------------------------------------------------
-    # IMPORTANT:
+    # ------------------------------------------------------
+    # M4C now evaluates restricted actions, but full commerce
+    # safety and controlled AUTO_RESPOND eligibility are still
+    # implemented in later M4 checkpoints.
     #
-    # M3E may judge the knowledge evidence as HIGH, but M4 has
-    # not yet evaluated restricted actions or commerce safety.
-    #
-    # Therefore M3E NEVER authorizes AUTO_RESPOND.
-    # --------------------------------------------------------
+    # Therefore normal answers remain REVIEW_REQUIRED here.
+    # ------------------------------------------------------
 
     reasons = [
         *assessment.reasons,
@@ -510,6 +997,7 @@ def run_ticket_ai_draft(
 
     latency_ms = max(
         0,
+
         round(
             (
                 perf_counter()
@@ -522,7 +1010,8 @@ def run_ticket_ai_draft(
 
     ai_run_id = (
         _persist_ai_run(
-            user=user,
+            user=
+                user,
 
             ticket_id=
                 ticket_id,
