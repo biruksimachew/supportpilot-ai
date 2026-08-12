@@ -5,8 +5,34 @@ from app.services.evidence_decision import (
 )
 
 
+# ----------------------------------------------------------
+# AUTO_RESPOND POLICY
+#
+# Only explicitly approved intents may be automatically
+# answered.
+#
+# Anything not present here fails closed to human review.
+# ----------------------------------------------------------
+
+AUTO_RESPOND_KNOWLEDGE_INTENTS = frozenset(
+    {
+        "product",
+        "return",
+        "shipping",
+    }
+)
+
+
+AUTO_RESPOND_COMMERCE_INTENTS = frozenset(
+    {
+        "order_status",
+    }
+)
+
+
 @dataclass(frozen=True)
 class UnifiedSafetyDecision:
+
     decision: str
 
     ticket_status: str
@@ -20,6 +46,9 @@ class UnifiedSafetyDecision:
 
 def decide_support_action(
     *,
+    intent:
+        str | None = None,
+
     restricted_categories:
         tuple[str, ...] = (),
 
@@ -46,9 +75,10 @@ def decide_support_action(
 
 ) -> UnifiedSafetyDecision:
 
-    # ------------------------------------------------------
-    # Restricted operations always fail closed.
-    # ------------------------------------------------------
+    # ======================================================
+    # GATE 1
+    # Restricted operations always require human review.
+    # ======================================================
 
     if restricted_categories:
 
@@ -66,8 +96,10 @@ def decide_support_action(
                 "RESTRICTED_ACTION_DETECTED",
 
                 *(
-                    "RESTRICTED_ACTION:"
-                    + category
+                    (
+                        "RESTRICTED_ACTION:"
+                        + category
+                    )
 
                     for category
                     in restricted_categories
@@ -87,9 +119,12 @@ def decide_support_action(
         )
 
 
-    # A ticket that already contains a restricted operation
-    # remains under human review until a later agent workflow
-    # explicitly resolves it.
+    # ======================================================
+    # GATE 2
+    # Once a ticket contains a restricted action it remains
+    # under human control until an agent workflow explicitly
+    # resolves that state.
+    # ======================================================
 
     if existing_restricted_action:
 
@@ -114,11 +149,16 @@ def decide_support_action(
         )
 
 
-    # ------------------------------------------------------
-    # Commerce path.
-    # ------------------------------------------------------
+    # ======================================================
+    # COMMERCE PATH
+    # ======================================================
 
     if commerce_required:
+
+        # --------------------------------------------------
+        # Order-specific commerce requests require an order
+        # number.
+        # --------------------------------------------------
 
         if order_number is None:
 
@@ -143,6 +183,11 @@ def decide_support_action(
             )
 
 
+        # --------------------------------------------------
+        # Exact-order identity verification is mandatory
+        # before order facts may be disclosed.
+        # --------------------------------------------------
+
         if identity_verified_for_order is not True:
 
             return UnifiedSafetyDecision(
@@ -165,6 +210,11 @@ def decide_support_action(
                     None,
             )
 
+
+        # --------------------------------------------------
+        # Verification succeeded, but commerce lookup did
+        # not.
+        # --------------------------------------------------
 
         if commerce_succeeded is False:
 
@@ -189,12 +239,54 @@ def decide_support_action(
             )
 
 
+        # --------------------------------------------------
+        # Verified read-only commerce facts are available.
+        # --------------------------------------------------
+
         if commerce_succeeded is True:
+
+            # Fail closed if the intent is not explicitly
+            # approved for automated commerce responses.
+
+            if (
+                intent
+                not in AUTO_RESPOND_COMMERCE_INTENTS
+            ):
+
+                return UnifiedSafetyDecision(
+                    decision=
+                        "REVIEW_REQUIRED",
+
+                    ticket_status=
+                        "DRAFTED",
+
+                    safe_draft_ready=
+                        True,
+
+                    reasons=(
+                        "COMMERCE_FACTS_VERIFIED",
+                        "SAFE_COMMERCE_DRAFT",
+                        "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+                        "AUTO_RESPONSE_BLOCKED",
+                    ),
+
+                    escalation_reason=
+                        None,
+                )
+
 
             return UnifiedSafetyDecision(
                 decision=
-                    "REVIEW_REQUIRED",
+                    "AUTO_RESPOND",
 
+                # IMPORTANT:
+                #
+                # The decision authorizes automatic delivery,
+                # but this endpoint has not actually sent the
+                # customer message yet.
+                #
+                # AUTO_RESPONDED should only be written after
+                # outbound delivery succeeds.
                 ticket_status=
                     "DRAFTED",
 
@@ -204,7 +296,8 @@ def decide_support_action(
                 reasons=(
                     "COMMERCE_FACTS_VERIFIED",
                     "SAFE_COMMERCE_DRAFT",
-                    "AUTO_SEND_NOT_EVALUATED",
+                    "AUTO_RESPONSE_ELIGIBLE",
+                    "AUTO_RESPONSE:VERIFIED_ORDER_STATUS",
                 ),
 
                 escalation_reason=
@@ -220,9 +313,9 @@ def decide_support_action(
         )
 
 
-    # ------------------------------------------------------
-    # Knowledge/RAG path.
-    # ------------------------------------------------------
+    # ======================================================
+    # KNOWLEDGE / RAG PATH
+    # ======================================================
 
     if evidence_assessment is None:
 
@@ -233,6 +326,11 @@ def decide_support_action(
             )
         )
 
+
+    # ------------------------------------------------------
+    # Weak, missing, contradictory, or generation-rejected
+    # evidence must never auto-respond.
+    # ------------------------------------------------------
 
     if (
         not evidence_assessment
@@ -264,10 +362,128 @@ def decide_support_action(
         )
 
 
+    # ------------------------------------------------------
+    # The answer may be usable as an agent draft, but
+    # ambiguous evidence is not safe enough for automation.
+    # ------------------------------------------------------
+
+    if evidence_assessment.ambiguity_detected:
+
+        return UnifiedSafetyDecision(
+            decision=
+                "REVIEW_REQUIRED",
+
+            ticket_status=
+                "DRAFTED",
+
+            safe_draft_ready=
+                True,
+
+            reasons=(
+                *evidence_assessment.reasons,
+
+                "SAFE_KNOWLEDGE_DRAFT",
+                "AUTO_RESPONSE_AMBIGUOUS_EVIDENCE",
+                "AUTO_RESPONSE_BLOCKED",
+            ),
+
+            escalation_reason=
+                None,
+        )
+
+
+    # ------------------------------------------------------
+    # AUTO_RESPOND requires HIGH evidence confidence.
+    #
+    # MEDIUM evidence can still be useful to an agent as a
+    # draft, but does not cross the automatic-send boundary.
+    # ------------------------------------------------------
+
+    if (
+        evidence_assessment
+        .confidence_band
+        != "HIGH"
+    ):
+
+        return UnifiedSafetyDecision(
+            decision=
+                "REVIEW_REQUIRED",
+
+            ticket_status=
+                "DRAFTED",
+
+            safe_draft_ready=
+                True,
+
+            reasons=(
+                *evidence_assessment.reasons,
+
+                "SAFE_KNOWLEDGE_DRAFT",
+                "AUTO_RESPONSE_CONFIDENCE_NOT_HIGH",
+                "AUTO_RESPONSE_BLOCKED",
+            ),
+
+            escalation_reason=
+                None,
+        )
+
+
+    # ------------------------------------------------------
+    # Even HIGH evidence is not enough by itself.
+    #
+    # Only explicitly approved intent classes may cross the
+    # automatic-response boundary.
+    # ------------------------------------------------------
+
+    if (
+        intent
+        not in AUTO_RESPOND_KNOWLEDGE_INTENTS
+    ):
+
+        return UnifiedSafetyDecision(
+            decision=
+                "REVIEW_REQUIRED",
+
+            ticket_status=
+                "DRAFTED",
+
+            safe_draft_ready=
+                True,
+
+            reasons=(
+                *evidence_assessment.reasons,
+
+                "SAFE_KNOWLEDGE_DRAFT",
+                "AUTO_RESPONSE_INTENT_NOT_ALLOWED",
+                "AUTO_RESPONSE_BLOCKED",
+            ),
+
+            escalation_reason=
+                None,
+        )
+
+
+    # ======================================================
+    # CONTROLLED AUTO_RESPOND
+    #
+    # Conditions already proven:
+    #
+    # - not restricted
+    # - no previous restricted state
+    # - non-commerce knowledge path
+    # - evidence supports generation
+    # - answer status ANSWERED
+    # - no ambiguity
+    # - HIGH confidence
+    # - intent explicitly allowlisted
+    # ======================================================
+
     return UnifiedSafetyDecision(
         decision=
-            "REVIEW_REQUIRED",
+            "AUTO_RESPOND",
 
+        # Authorization has been granted, but no outbound
+        # transport has confirmed delivery yet.
         ticket_status=
             "DRAFTED",
 
@@ -278,7 +494,14 @@ def decide_support_action(
             *evidence_assessment.reasons,
 
             "SAFE_KNOWLEDGE_DRAFT",
-            "AUTO_SEND_NOT_EVALUATED",
+            "AUTO_RESPONSE_ELIGIBLE",
+
+            (
+                "AUTO_RESPONSE:KNOWLEDGE_"
+                + str(
+                    intent
+                ).upper()
+            ),
         ),
 
         escalation_reason=

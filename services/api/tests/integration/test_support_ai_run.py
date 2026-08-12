@@ -615,14 +615,12 @@ def test_ai_run_persists_grounding_and_evidence(
         # This is a safe grounded draft, but M4E has not yet
         # authorized automatic sending.
         # ==================================================
-
         assert (
             result[
                 "decision"
             ]
-            == "REVIEW_REQUIRED"
+            == "AUTO_RESPOND"
         )
-
 
         assert (
             result[
@@ -649,7 +647,15 @@ def test_ai_run_persists_grounding_and_evidence(
 
 
         assert (
-            "AUTO_SEND_NOT_EVALUATED"
+            "AUTO_RESPONSE_ELIGIBLE"
+            in result[
+                "decision_reasons"
+            ]
+        )
+
+
+        assert (
+            "AUTO_RESPONSE:KNOWLEDGE_RETURN"
             in result[
                 "decision_reasons"
             ]
@@ -699,7 +705,7 @@ def test_ai_run_persists_grounding_and_evidence(
 
                 assert row == (
                     "HIGH",
-                    "REVIEW_REQUIRED",
+                    "AUTO_RESPOND",
                     "generation-test",
                     "generation-test-v1",
                     "return",

@@ -519,8 +519,24 @@ def test_verified_order_status_creates_safe_commerce_draft(
             result[
                 "decision"
             ]
-            == "REVIEW_REQUIRED"
+            == "AUTO_RESPOND"
         )
+
+        assert (
+            "AUTO_RESPONSE_ELIGIBLE"
+            in result[
+                "decision_reasons"
+            ]
+        )
+
+
+        assert (
+            "AUTO_RESPONSE:VERIFIED_ORDER_STATUS"
+            in result[
+                "decision_reasons"
+            ]
+        )
+
 
         assert (
             result[

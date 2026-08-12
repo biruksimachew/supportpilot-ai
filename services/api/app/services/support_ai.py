@@ -74,9 +74,8 @@ from app.services.support_decision import (
 
 
 PROMPT_VERSION = (
-    "grounded-v1+unified-decision-v1"
+    "grounded-v1+unified-decision-v2"
 )
-
 
 RESTRICTED_ACTION_VERSION = (
     "restricted-action-v1"
@@ -84,7 +83,7 @@ RESTRICTED_ACTION_VERSION = (
 
 
 UNIFIED_DECISION_VERSION = (
-    "unified-decision-v1"
+    "unified-decision-v2"
 )
 
 
@@ -513,6 +512,12 @@ def _insert_decision_audit(
 
                     "safe_draft_ready":
                         decision.safe_draft_ready,
+
+                    "auto_response_eligible":
+                        (
+                            decision.decision
+                            == "AUTO_RESPOND"
+                        ),
 
                     "reasons":
                         list(
@@ -2062,6 +2067,9 @@ def run_ticket_ai_draft(
 
         decision = (
             decide_support_action(
+                intent=
+                    classification.intent,
+
                 commerce_required=
                     True,
 
@@ -2173,7 +2181,7 @@ def run_ticket_ai_draft(
                 order_number,
 
             safe_draft_ready=
-                True,
+                decision.safe_draft_ready,
 
             commerce_order=
                 commerce_lookup.order,
@@ -2292,6 +2300,9 @@ def run_ticket_ai_draft(
 
     decision = (
         decide_support_action(
+            intent=
+                classification.intent,
+
             evidence_assessment=
                 assessment,
 
@@ -2299,7 +2310,6 @@ def run_ticket_ai_draft(
                 answer.status,
         )
     )
-
 
     latency_ms = max(
         0,
