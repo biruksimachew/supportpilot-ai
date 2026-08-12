@@ -30,9 +30,12 @@ from app.api.routes.knowledge_retrieval import (
 from app.api.routes.grounded_answer import (
     router as grounded_answer_router,
 )
+from app.api.routes.identity_verification import (
+    router as identity_verification_router,
+)
 app = FastAPI(
     title=settings.app_name,
-    version="0.4.0",
+    version="0.4.1",
     description=(
         "SupportPilot AI support core API."
     ),
@@ -73,6 +76,7 @@ app.include_router(knowledge_retrieval_router)
 app.include_router(grounded_answer_router)
 app.include_router(support_ai_router)
 app.include_router(commerce_router)
+app.include_router(identity_verification_router)
 
 @app.get("/", tags=["system"])
 def root() -> dict[str, str]:

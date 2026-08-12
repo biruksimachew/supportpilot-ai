@@ -30,6 +30,7 @@ from app.services.commerce_lookup import (
     CommerceAIRunScopeError,
     CommerceCustomerIdentityError,
     CommerceCustomerNotFoundError,
+    CommerceIdentityNotVerifiedError,
     CommerceOrderFormatError,
     CommerceOrderNotFoundError,
     lookup_customer_order,
@@ -44,9 +45,7 @@ router = APIRouter(
 
 @router.post(
     "/orders/lookup",
-
-    response_model=
-        CommerceOrderLookupResponse,
+    response_model=CommerceOrderLookupResponse,
 )
 def lookup_order(
     payload: CommerceOrderLookupRequest,
@@ -65,8 +64,7 @@ def lookup_order(
 
 
         return lookup_customer_order(
-            user=
-                user,
+            user=user,
 
             customer_id=
                 payload.customer_id,
@@ -81,6 +79,10 @@ def lookup_order(
                 provider,
         )
 
+
+    # ------------------------------------------------------
+    # Customer record itself does not exist.
+    # ------------------------------------------------------
 
     except CommerceCustomerNotFoundError as exc:
 
@@ -97,6 +99,14 @@ def lookup_order(
             },
         ) from exc
 
+
+    # ------------------------------------------------------
+    # The order is unavailable inside this customer's scope.
+    #
+    # Important:
+    # We do not reveal whether the order exists for somebody
+    # else.
+    # ------------------------------------------------------
 
     except CommerceOrderNotFoundError as exc:
 
@@ -117,6 +127,15 @@ def lookup_order(
         ) from exc
 
 
+    # ------------------------------------------------------
+    # Order number itself is malformed.
+    # Example:
+    #   abc123
+    #
+    # Expected Northstar format:
+    #   #NS10041
+    # ------------------------------------------------------
+
     except CommerceOrderFormatError as exc:
 
         raise HTTPException(
@@ -132,6 +151,41 @@ def lookup_order(
             },
         ) from exc
 
+
+    # ------------------------------------------------------
+    # NEW M4B SECURITY HANDLER
+    #
+    # The AI run attempted commerce access before identity
+    # verification was completed for this exact order.
+    # ------------------------------------------------------
+
+    except CommerceIdentityNotVerifiedError as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_409_CONFLICT,
+
+            detail={
+                "code":
+                    "CUSTOMER_NOT_VERIFIED",
+
+                "message":
+                    (
+                        "Customer identity has "
+                        "not been verified for "
+                        "this order."
+                    ),
+            },
+        ) from exc
+
+
+    # ------------------------------------------------------
+    # Other customer / AI-run scope problems.
+    #
+    # Examples:
+    # - customer has no commerce external ID
+    # - AI run belongs to a different customer
+    # ------------------------------------------------------
 
     except (
         CommerceCustomerIdentityError,
@@ -152,6 +206,10 @@ def lookup_order(
         ) from exc
 
 
+    # ------------------------------------------------------
+    # Commerce integration configuration is invalid.
+    # ------------------------------------------------------
+
     except CommerceConfigurationError as exc:
 
         raise HTTPException(
@@ -171,6 +229,10 @@ def lookup_order(
         ) from exc
 
 
+    # ------------------------------------------------------
+    # Commerce provider itself failed.
+    # ------------------------------------------------------
+
     except CommerceProviderError as exc:
 
         raise HTTPException(
@@ -189,6 +251,10 @@ def lookup_order(
             },
         ) from exc
 
+
+    # ------------------------------------------------------
+    # Database failure while handling commerce lookup.
+    # ------------------------------------------------------
 
     except psycopg.Error as exc:
 

@@ -64,6 +64,11 @@ class CommerceAIRunScopeError(
 ):
     pass
 
+class CommerceIdentityNotVerifiedError(
+    PermissionError
+):
+    pass
+
 
 def _actor_type(
     user: InternalUser,
@@ -207,7 +212,11 @@ def _load_ai_run_scope(
                 select
                     ar.id,
                     ar.ticket_id,
-                    t.customer_ref
+
+                    t.customer_ref,
+
+                    t.identity_verification_status,
+                    t.identity_verified_order_number
 
                 from public.ai_runs ar
 
@@ -238,8 +247,6 @@ def _load_ai_run_scope(
 
 
     return row
-
-
 def _insert_tool_call(
     cursor,
     *,
@@ -541,6 +548,68 @@ def lookup_customer_order(
         )
 
 
+        # --------------------------------------------------
+        # Gate 1:
+        # The ticket behind this AI run must have already
+        # passed customer identity verification for the
+        # exact order being requested.
+        # --------------------------------------------------
+
+        if (
+            ai_scope[
+                "identity_verification_status"
+            ]
+            != "VERIFIED"
+
+            or ai_scope[
+                "identity_verified_order_number"
+            ]
+            != normalized_order_number
+        ):
+
+            _record_non_success(
+                user=
+                    user,
+
+                customer_id=
+                    customer_id,
+
+                order_number=
+                    normalized_order_number,
+
+                ai_run_id=
+                    ai_run_id,
+
+                status=
+                    "BLOCKED",
+
+                result_summary=
+                    (
+                        "Customer identity "
+                        "verification is required "
+                        "for this order."
+                    ),
+
+                latency_ms=
+                    0,
+            )
+
+
+            raise CommerceIdentityNotVerifiedError(
+                (
+                    "Customer identity has not "
+                    "been verified for this order."
+                )
+            )
+
+
+        # --------------------------------------------------
+        # Gate 2:
+        # Even after verification, the customer attached to
+        # the AI run must be the same customer requested by
+        # this commerce lookup.
+        # --------------------------------------------------
+
         if (
             ai_scope[
                 "customer_ref"
@@ -583,7 +652,6 @@ def lookup_customer_order(
                     "requested customer."
                 )
             )
-
 
     started_at = (
         perf_counter()

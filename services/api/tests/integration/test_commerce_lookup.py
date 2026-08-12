@@ -237,11 +237,37 @@ def test_customer_scoped_order_lookup_and_tool_audit():
 
             with connection.cursor() as cursor:
 
+                # --------------------------------------------------
+                # This is an M4A commerce-isolation test.
+                #
+                # Identity verification itself is tested separately
+                # in test_identity_verification.py.
+                #
+                # Therefore, for this older M4A test, we establish a
+                # legitimate VERIFIED ticket directly in the fixture.
+                # --------------------------------------------------
+
                 cursor.execute(
                     """
                     update public.tickets
 
-                    set customer_ref = %s
+                    set
+                        customer_ref = %s,
+
+                        identity_verification_status =
+                            'VERIFIED',
+
+                        identity_verification_method =
+                            'EMAIL_POSTCODE_ORDER',
+
+                        identity_verified_at =
+                            now(),
+
+                        identity_verified_order_number =
+                            '#NS10041',
+
+                        identity_verification_attempts =
+                            1
 
                     where id = %s;
                     """,
@@ -292,7 +318,6 @@ def test_customer_scoped_order_lookup_and_tool_audit():
                         0
                     ]
                 )
-
 
         valid = client.post(
             "/api/v1/agent/commerce/orders/lookup",
@@ -537,3 +562,4 @@ def test_customer_scoped_order_lookup_and_tool_audit():
             cleanup_ticket(
                 ticket_id
             )
+
