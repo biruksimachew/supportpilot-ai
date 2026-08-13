@@ -4,6 +4,7 @@ import type {
   TicketChannel,
   TicketPriority,
   TicketStatus,
+  AgentDashboardResponse,
 } from "@/lib/staff-types";
 
 
@@ -236,6 +237,33 @@ export async function getAgentTicket(
 
   return parseResponse<
     AgentTicketDetail
+  >(
+    response,
+  );
+}
+
+
+export async function getAgentDashboard(
+  accessToken: string,
+): Promise<AgentDashboardResponse> {
+
+  const response =
+    await fetch(
+      `${API_URL}/api/v1/agent/dashboard`,
+      {
+        headers: {
+          Authorization:
+            `Bearer ${accessToken}`,
+        },
+
+        cache:
+          "no-store",
+      },
+    );
+
+
+  return parseResponse<
+    AgentDashboardResponse
   >(
     response,
   );

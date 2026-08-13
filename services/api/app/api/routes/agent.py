@@ -56,6 +56,13 @@ from app.services.outbound_delivery import (
     send_agent_reply,
 )
 
+from app.schemas.dashboard import (
+    AgentDashboardResponse,
+)
+
+from app.services.dashboard import (
+    get_agent_dashboard,
+)
 
 
 TicketStatus = Literal[
@@ -586,6 +593,41 @@ def send_ticket_reply(
                     (
                         "The reply could "
                         "not be delivered."
+                    ),
+            },
+        ) from exc
+
+
+@router.get(
+    "/dashboard",
+    response_model=
+        AgentDashboardResponse,
+)
+def read_agent_dashboard(
+    _user: InternalUser = Depends(
+        get_current_internal_user
+    ),
+) -> AgentDashboardResponse:
+
+    try:
+
+        return get_agent_dashboard()
+
+    except psycopg.Error as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+
+            detail={
+                "code":
+                    "AGENT_DASHBOARD_UNAVAILABLE",
+
+                "message":
+                    (
+                        "Operations metrics "
+                        "are temporarily "
+                        "unavailable."
                     ),
             },
         ) from exc

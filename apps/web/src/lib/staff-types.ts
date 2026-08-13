@@ -168,3 +168,105 @@ export type AgentTicketDetail = {
   audit_events:
     AgentAuditEvent[];
 };
+
+
+export type DashboardDistributionItem = {
+  key: string;
+  count: number;
+};
+
+
+export type DashboardQueueSummary = {
+  open_tickets: number;
+  review_required: number;
+  waiting_customer: number;
+  drafted: number;
+  new_tickets: number;
+  urgent_p1_p2: number;
+  unassigned: number;
+  restricted_open: number;
+};
+
+
+export type DashboardAISummary = {
+  total_runs: number;
+  auto_respond: number;
+  review_required: number;
+  request_clarification: number;
+  failed: number;
+
+  automation_rate_pct:
+    number | null;
+};
+
+
+export type DashboardDeliverySummary = {
+  total_deliveries: number;
+  delivered: number;
+  failed: number;
+  uncertain: number;
+  pending: number;
+
+  delivery_success_rate_pct:
+    number | null;
+};
+
+
+export type DashboardResolutionSummary = {
+  resolved_tickets: number;
+
+  average_resolution_minutes:
+    number | null;
+};
+
+
+export type DashboardActivityItem = {
+  id: string;
+
+  actor_type: string;
+
+  event_type: string;
+
+  ticket_id:
+    string | null;
+
+  ticket_reference:
+    string | null;
+
+  created_at: string;
+};
+
+
+export type AgentDashboardResponse = {
+  generated_at: string;
+
+  queue:
+    DashboardQueueSummary;
+
+  status_breakdown:
+    DashboardDistributionItem[];
+
+  priority_breakdown:
+    DashboardDistributionItem[];
+
+  channel_breakdown:
+    DashboardDistributionItem[];
+
+  intent_breakdown:
+    DashboardDistributionItem[];
+
+  escalation_breakdown:
+    DashboardDistributionItem[];
+
+  ai:
+    DashboardAISummary;
+
+  delivery:
+    DashboardDeliverySummary;
+
+  resolution:
+    DashboardResolutionSummary;
+
+  recent_activity:
+    DashboardActivityItem[];
+};
