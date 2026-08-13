@@ -129,7 +129,24 @@ class AgentToolCall(BaseModel):
 
     created_at: datetime
 
+class AgentDraftSnapshot(BaseModel):
+    action_id: UUID
 
+    ai_run_id: UUID
+
+    source_message_id: UUID | None
+
+    answer_status: str | None
+
+    original_body: str
+
+    decision: str
+
+    decision_reasons: list[str]
+
+    safe_draft_ready: bool
+
+    created_at: datetime
 class AgentAuditEvent(BaseModel):
     id: UUID
 
@@ -197,3 +214,4 @@ class AgentTicketDetail(BaseModel):
     tool_calls: list[AgentToolCall]
 
     audit_events: list[AgentAuditEvent]
+    latest_draft: AgentDraftSnapshot | None

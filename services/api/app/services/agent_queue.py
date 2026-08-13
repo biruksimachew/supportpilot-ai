@@ -9,6 +9,7 @@ from app.core.database import (
 from app.schemas.agent import (
     AgentAIRunSummary,
     AgentAuditEvent,
+    AgentDraftSnapshot,
     AgentOrderSummary,
     AgentQueueItem,
     AgentQueueResponse,
@@ -521,6 +522,10 @@ def get_agent_ticket(
             ] = []
 
 
+            latest_draft: (
+                AgentDraftSnapshot | None
+            ) = None
+
             if ai_run_row is not None:
 
                 reasons = list(
@@ -559,6 +564,97 @@ def get_agent_ticket(
                             ),
                     )
                 )
+
+
+
+                cursor.execute(
+                    """
+                    select
+                        aa.id
+                            as action_id,
+
+                        (
+                            aa.after_value
+                            ->> 'ai_run_id'
+                        )::uuid
+                            as ai_run_id,
+
+                        (
+                            aa.after_value
+                            ->> 'source_message_id'
+                        )::uuid
+                            as source_message_id,
+
+                        aa.after_value
+                            ->> 'answer_status'
+                            as answer_status,
+
+                        aa.after_value
+                            ->> 'original_body'
+                            as original_body,
+
+                        aa.after_value
+                            ->> 'decision'
+                            as decision,
+
+                        aa.after_value
+                            -> 'decision_reasons'
+                            as decision_reasons,
+
+                        coalesce(
+                            (
+                                aa.after_value
+                                ->> 'safe_draft_ready'
+                            )::boolean,
+                            false
+                        )
+                            as safe_draft_ready,
+
+                        aa.created_at
+
+                    from public.agent_actions as aa
+
+                    where
+                        aa.ticket_id = %s
+
+                        and aa.action =
+                            'AI_DRAFT_CAPTURED'
+
+                        and (
+                            aa.after_value
+                            ->> 'ai_run_id'
+                        ) = %s
+
+                    order by
+                        aa.created_at desc,
+                        aa.id desc
+
+                    limit 1;
+                    """,
+                    (
+                        ticket_id,
+
+                        str(
+                            ai_run_row[
+                                "id"
+                            ]
+                        ),
+                    ),
+                )
+
+
+                draft_row = (
+                    cursor.fetchone()
+                )
+
+
+                if draft_row is not None:
+
+                    latest_draft = (
+                        AgentDraftSnapshot(
+                            **draft_row
+                        )
+                    )
 
 
                 # ==============================================
@@ -747,6 +843,9 @@ def get_agent_ticket(
 
         latest_ai_run=
             latest_ai_run,
+
+        latest_draft=
+            latest_draft,
 
         retrieval_evidence=
             retrieval_evidence,

@@ -49,6 +49,11 @@ from app.services.commerce import (
     CommerceConfigurationError,
     CommerceProviderError,
 )
+from app.services.agent_workflow import (
+    capture_ai_draft,
+)
+
+
 
 router = APIRouter(
     prefix="/api/v1/agent/tickets",
@@ -86,7 +91,7 @@ def create_ticket_ai_draft(
         )
 
 
-        return run_ticket_ai_draft(
+        result = run_ticket_ai_draft(
             user=user,
 
             ticket_id=
@@ -101,6 +106,15 @@ def create_ticket_ai_draft(
             generation_provider=
                 generation_provider,
         )
+
+
+        capture_ai_draft(
+            user=user,
+            result=result,
+        )
+
+
+        return result
 
 
     except TicketMessageNotFoundError as exc:
