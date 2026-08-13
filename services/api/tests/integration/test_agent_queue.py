@@ -2,7 +2,7 @@ from uuid import UUID, uuid4
 
 import psycopg
 from fastapi.testclient import TestClient
-
+from psycopg.types.json import Jsonb
 from app.core.auth import (
     get_current_internal_user,
 )
@@ -138,17 +138,187 @@ def test_agent_queue_and_ticket_detail() -> None:
         with psycopg.connect(
             settings.database_url
         ) as connection:
+
             with connection.cursor() as cursor:
+
                 cursor.execute(
                     """
                     update public.tickets
+
                     set
                         priority = 'P2',
-                        status = 'REVIEW_REQUIRED',
-                        intent = 'damaged_item'
+
+                        status =
+                            'REVIEW_REQUIRED',
+
+                        intent =
+                            'damaged_item',
+
+                        confidence_band =
+                            'HIGH'
+
                     where id = %s;
                     """,
-                    (p2.ticket_id,),
+                    (
+                        p2.ticket_id,
+                    ),
+                )
+
+
+                cursor.execute(
+                    """
+                    insert into public.ai_runs (
+                        ticket_id,
+                        message_id,
+
+                        provider,
+                        model,
+
+                        prompt_version,
+
+                        intent,
+
+                        confidence,
+                        confidence_band,
+
+                        decision,
+                        decision_reasons,
+
+                        latency_ms,
+                        error_code
+                    )
+
+                    values (
+                        %s,
+                        %s,
+
+                        'test-provider',
+                        'test-model',
+
+                        'm5-workspace-test-v1',
+
+                        'damaged_item',
+
+                        0.9100,
+                        'HIGH',
+
+                        'REVIEW_REQUIRED',
+
+                        %s,
+
+                        125,
+                        null
+                    )
+
+                    returning id;
+                    """,
+                    (
+                        p2.ticket_id,
+
+                        p2.message_id,
+
+                        Jsonb(
+                            [
+                                "EVIDENCE_SUFFICIENT",
+                                "SAFE_KNOWLEDGE_DRAFT",
+                                (
+                                    "AUTO_RESPONSE_"
+                                    "INTENT_NOT_ALLOWED"
+                                ),
+                                "AUTO_RESPONSE_BLOCKED",
+                            ]
+                        ),
+                    ),
+                )
+
+
+                ai_run_id = (
+                    cursor.fetchone()[0]
+                )
+
+
+                cursor.execute(
+                    """
+                    select id
+
+                    from public.knowledge_chunks
+
+                    order by id
+
+                    limit 1;
+                    """
+                )
+
+
+                chunk_row = (
+                    cursor.fetchone()
+                )
+
+
+                assert (
+                    chunk_row is not None
+                )
+
+
+                chunk_id = (
+                    chunk_row[0]
+                )
+
+
+                cursor.execute(
+                    """
+                    insert into
+                        public.retrieval_evidence (
+                            ai_run_id,
+                            chunk_id,
+                            rank,
+                            score
+                        )
+
+                    values (
+                        %s,
+                        %s,
+                        1,
+                        0.9123
+                    );
+                    """,
+                    (
+                        ai_run_id,
+                        chunk_id,
+                    ),
+                )
+
+
+                cursor.execute(
+                    """
+                    insert into public.tool_calls (
+                        ai_run_id,
+
+                        tool_name,
+
+                        safe_request_summary,
+                        result_summary,
+
+                        status,
+                        latency_ms
+                    )
+
+                    values (
+                        %s,
+
+                        'test.context_lookup',
+
+                        'synthetic workspace lookup',
+
+                        'synthetic lookup succeeded',
+
+                        'SUCCEEDED',
+                        20
+                    );
+                    """,
+                    (
+                        ai_run_id,
+                    ),
                 )
 
         queue = client.get(
@@ -213,6 +383,169 @@ def test_agent_queue_and_ticket_detail() -> None:
             detail_result["messages"][0]["body"]
             == "My item arrived damaged."
         )
+
+
+        assert (
+            detail_result[
+                "identity_verification_status"
+            ]
+            == "UNVERIFIED"
+        )
+
+
+        latest_ai_run = (
+            detail_result[
+                "latest_ai_run"
+            ]
+        )
+
+
+        assert (
+            latest_ai_run
+            is not None
+        )
+
+
+        assert (
+            latest_ai_run[
+                "provider"
+            ]
+            == "test-provider"
+        )
+
+
+        assert (
+            latest_ai_run[
+                "model"
+            ]
+            == "test-model"
+        )
+
+
+        assert (
+            latest_ai_run[
+                "intent"
+            ]
+            == "damaged_item"
+        )
+
+
+        assert (
+            latest_ai_run[
+                "confidence_band"
+            ]
+            == "HIGH"
+        )
+
+
+        assert (
+            latest_ai_run[
+                "decision"
+            ]
+            == "REVIEW_REQUIRED"
+        )
+
+
+        assert (
+            latest_ai_run[
+                "safe_draft_ready"
+            ]
+            is True
+        )
+
+
+        assert (
+            latest_ai_run[
+                "auto_response_eligible"
+            ]
+            is False
+        )
+
+
+        assert (
+            (
+                "AUTO_RESPONSE_BLOCKED"
+                in latest_ai_run[
+                    "decision_reasons"
+                ]
+            )
+        )
+
+
+        assert (
+            latest_ai_run[
+                "source_message_body"
+            ]
+            == "My item arrived damaged."
+        )
+
+
+        assert (
+            len(
+                detail_result[
+                    "retrieval_evidence"
+                ]
+            )
+            == 1
+        )
+
+
+        evidence = (
+            detail_result[
+                "retrieval_evidence"
+            ][0]
+        )
+
+
+        assert (
+            evidence["rank"]
+            == 1
+        )
+
+
+        assert (
+            evidence["source_title"]
+        )
+
+
+        assert (
+            evidence["content"]
+        )
+
+
+        assert (
+            len(
+                detail_result[
+                    "tool_calls"
+                ]
+            )
+            == 1
+        )
+
+
+        tool_call = (
+            detail_result[
+                "tool_calls"
+            ][0]
+        )
+
+
+        assert (
+            tool_call[
+                "tool_name"
+            ]
+            == "test.context_lookup"
+        )
+
+
+        assert (
+            tool_call[
+                "status"
+            ]
+            == "SUCCEEDED"
+        )
+
+
 
     finally:
         app.dependency_overrides.clear()
