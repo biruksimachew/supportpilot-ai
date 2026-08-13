@@ -1,6 +1,9 @@
 import type {
   AgentQueueResponse,
   AgentTicketDetail,
+  TicketChannel,
+  TicketPriority,
+  TicketStatus,
 } from "@/lib/staff-types";
 
 
@@ -12,7 +15,9 @@ const API_URL =
 
 export class StaffApiError
   extends Error {
+
   status: number;
+
 
   constructor(
     message: string,
@@ -32,18 +37,26 @@ export class StaffApiError
 async function parseResponse<T>(
   response: Response,
 ): Promise<T> {
-    if (response.ok) {
-    return response.json() as Promise<T>;
-    }
+
+  if (response.ok) {
+    return (
+      response.json() as Promise<T>
+    );
+  }
 
 
   let message =
-    "SupportPilot could not complete the request.";
+    (
+      "SupportPilot could not "
+      + "complete the request."
+    );
 
 
   try {
+
     const body =
       await response.json();
+
 
     if (
       typeof body?.detail?.message
@@ -52,8 +65,10 @@ async function parseResponse<T>(
       message =
         body.detail.message;
     }
+
   } catch {
-    // Keep safe fallback.
+    // Preserve the safe generic
+    // fallback message.
   }
 
 
@@ -65,16 +80,28 @@ async function parseResponse<T>(
 
 
 export type QueueFilters = {
-  status?: string;
-  priority?: string;
-  channel?: string;
+  status?: TicketStatus;
+
+  priority?: TicketPriority;
+
+  intent?: string;
+
+  channel?: TicketChannel;
+
+  includeResolved?: boolean;
+
+  limit?: number;
+  offset?: number;
 };
 
 
 export async function getAgentQueue(
   accessToken: string,
+
   filters: QueueFilters = {},
+
 ): Promise<AgentQueueResponse> {
+
   const params =
     new URLSearchParams();
 
@@ -86,6 +113,7 @@ export async function getAgentQueue(
     );
   }
 
+
   if (filters.priority) {
     params.set(
       "priority",
@@ -93,10 +121,53 @@ export async function getAgentQueue(
     );
   }
 
+
+  if (filters.intent) {
+    params.set(
+      "intent",
+      filters.intent,
+    );
+  }
+
+
   if (filters.channel) {
     params.set(
       "channel",
       filters.channel,
+    );
+  }
+
+
+  if (filters.includeResolved) {
+    params.set(
+      "include_resolved",
+      "true",
+    );
+  }
+
+
+  if (
+    typeof filters.limit
+    === "number"
+  ) {
+    params.set(
+      "limit",
+      String(
+        filters.limit,
+      ),
+    );
+  }
+
+
+  if (
+    typeof filters.offset
+    === "number"
+  ) {
+    params.set(
+      "offset",
+      String(
+        filters.offset,
+      ),
     );
   }
 
@@ -107,45 +178,65 @@ export async function getAgentQueue(
 
   const response =
     await fetch(
-      `${API_URL}/api/v1/agent/tickets${
-        query
-          ? `?${query}`
-          : ""
-      }`,
+      (
+        `${API_URL}`
+        + "/api/v1/agent/tickets"
+        + (
+          query
+            ? `?${query}`
+            : ""
+        )
+      ),
+
       {
         headers: {
           Authorization:
             `Bearer ${accessToken}`,
         },
-        cache: "no-store",
+
+        cache:
+          "no-store",
       },
     );
 
 
   return parseResponse<
     AgentQueueResponse
-  >(response);
+  >(
+    response,
+  );
 }
 
 
 export async function getAgentTicket(
   accessToken: string,
   ticketId: string,
+
 ): Promise<AgentTicketDetail> {
+
   const response =
     await fetch(
-      `${API_URL}/api/v1/agent/tickets/${ticketId}`,
+      (
+        `${API_URL}`
+        + "/api/v1/agent/tickets/"
+        + ticketId
+      ),
+
       {
         headers: {
           Authorization:
             `Bearer ${accessToken}`,
         },
-        cache: "no-store",
+
+        cache:
+          "no-store",
       },
     );
 
 
   return parseResponse<
     AgentTicketDetail
-  >(response);
+  >(
+    response,
+  );
 }

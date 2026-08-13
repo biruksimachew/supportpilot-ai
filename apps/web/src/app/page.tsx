@@ -13,7 +13,7 @@ export default function Home() {
 
           <h1 className="mt-6 max-w-xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
             Support that knows when
-            to answer — and when
+            to answer - and when
             to involve a person.
           </h1>
 

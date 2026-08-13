@@ -1,14 +1,44 @@
+export type TicketStatus =
+  | "NEW"
+  | "TRIAGED"
+  | "DRAFTED"
+  | "AUTO_RESPONDED"
+  | "REVIEW_REQUIRED"
+  | "WAITING_CUSTOMER"
+  | "RESOLVED"
+  | "FAILED";
+
+
+export type TicketPriority =
+  | "P1"
+  | "P2"
+  | "P3"
+  | "P4";
+
+
+export type TicketChannel =
+  | "chat"
+  | "email";
+
+
+export type ConfidenceBand =
+  | "HIGH"
+  | "MEDIUM"
+  | "LOW";
+
+
 export type AgentQueueItem = {
   id: string;
   reference: string;
 
-  channel: string;
-  status: string;
-  priority: string;
+  channel: TicketChannel;
+  status: TicketStatus;
+  priority: TicketPriority;
 
   intent: string | null;
+
   confidence_band:
-    string | null;
+    ConfidenceBand | null;
 
   customer_name:
     string | null;
@@ -34,6 +64,7 @@ export type AgentQueueItem = {
 
 export type AgentQueueResponse = {
   items: AgentQueueItem[];
+
   total: number;
   limit: number;
   offset: number;
@@ -42,10 +73,14 @@ export type AgentQueueResponse = {
 
 export type AgentTicketMessage = {
   id: string;
+
   direction: string;
   sender_type: string;
+
   body: string;
+
   is_internal: boolean;
+
   sent_at: string;
   received_at: string;
 };
@@ -53,6 +88,7 @@ export type AgentTicketMessage = {
 
 export type AgentOrderSummary = {
   external_order_id: string;
+
   status: string;
 
   fulfillment_summary:
@@ -67,8 +103,10 @@ export type AgentOrderSummary = {
 
 export type AgentAuditEvent = {
   id: string;
+
   actor_type: string;
   event_type: string;
+
   entity_type: string;
   entity_id: string;
 
@@ -83,14 +121,14 @@ export type AgentTicketDetail = {
   id: string;
   reference: string;
 
-  channel: string;
-  status: string;
-  priority: string;
+  channel: TicketChannel;
+  status: TicketStatus;
+  priority: TicketPriority;
 
   intent: string | null;
 
   confidence_band:
-    string | null;
+    ConfidenceBand | null;
 
   restricted_action: boolean;
 
@@ -102,7 +140,9 @@ export type AgentTicketDetail = {
 
   created_at: string;
   updated_at: string;
-  resolved_at: string | null;
+
+  resolved_at:
+    string | null;
 
   customer_id:
     string | null;
