@@ -1,6 +1,5 @@
 "use client";
 
-
 import {
   useCallback,
   useEffect,
@@ -13,23 +12,24 @@ import {
 } from "next/navigation";
 
 import {
-  getSupabaseBrowserClient,
-} from "@/lib/supabase-browser";
-
-import {
   getAgentQueue,
-  getAgentTicket,
   StaffApiError,
 } from "@/lib/staff-api";
 
+import {
+  getSupabaseBrowserClient,
+} from "@/lib/supabase-browser";
+
 import type {
   AgentQueueItem,
-  AgentTicketDetail,
   ConfidenceBand,
   TicketChannel,
   TicketPriority,
   TicketStatus,
 } from "@/lib/staff-types";
+
+import StaffShell
+  from "@/components/staff-shell";
 
 
 const STATUS_OPTIONS:
@@ -37,169 +37,56 @@ const STATUS_OPTIONS:
     value: TicketStatus;
     label: string;
   }[] = [
-
-    {
-      value:
-        "NEW",
-      label:
-        "New",
-    },
-
-    {
-      value:
-        "TRIAGED",
-      label:
-        "Triaged",
-    },
-
-    {
-      value:
-        "DRAFTED",
-      label:
-        "Drafted",
-    },
-
-    {
-      value:
-        "AUTO_RESPONDED",
-      label:
-        "Auto responded",
-    },
-
-    {
-      value:
-        "REVIEW_REQUIRED",
-      label:
-        "Review required",
-    },
-
-    {
-      value:
-        "WAITING_CUSTOMER",
-      label:
-        "Waiting customer",
-    },
-
-    {
-      value:
-        "FAILED",
-      label:
-        "Failed",
-    },
-
-    {
-      value:
-        "RESOLVED",
-      label:
-        "Resolved",
-    },
+    { value: "NEW", label: "New" },
+    { value: "TRIAGED", label: "Triaged" },
+    { value: "DRAFTED", label: "Drafted" },
+    { value: "AUTO_RESPONDED", label: "Auto responded" },
+    { value: "REVIEW_REQUIRED", label: "Review required" },
+    { value: "WAITING_CUSTOMER", label: "Waiting customer" },
+    { value: "FAILED", label: "Failed" },
+    { value: "RESOLVED", label: "Resolved" },
   ];
 
 
 const INTENT_OPTIONS = [
-  {
-    value:
-      "order_status",
-    label:
-      "Order status",
-  },
-
-  {
-    value:
-      "shipping",
-    label:
-      "Shipping",
-  },
-
-  {
-    value:
-      "return",
-    label:
-      "Return",
-  },
-
-  {
-    value:
-      "damaged_item",
-    label:
-      "Damaged item",
-  },
-
-  {
-    value:
-      "product",
-    label:
-      "Product",
-  },
-
-  {
-    value:
-      "account",
-    label:
-      "Account",
-  },
-
-  {
-    value:
-      "complaint",
-    label:
-      "Complaint",
-  },
-
-  {
-    value:
-      "other",
-    label:
-      "Other",
-  },
+  { value: "order_status", label: "Order status" },
+  { value: "shipping", label: "Shipping" },
+  { value: "return", label: "Return" },
+  { value: "damaged_item", label: "Damaged item" },
+  { value: "product", label: "Product" },
+  { value: "account", label: "Account" },
+  { value: "complaint", label: "Complaint" },
+  { value: "other", label: "Other" },
 ];
 
 
 function humanize(
   value: string | null,
 ): string {
-
   if (!value) {
     return "-";
   }
 
-
-  const words =
-    value
-      .replaceAll(
-        "_",
-        " ",
-      )
-      .toLowerCase();
-
-
-  return (
-    words
-      .charAt(
-        0,
-      )
-      .toUpperCase()
-    + words.slice(
-      1,
-    )
-  );
+  return value
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(
+      /\b\w/g,
+      (character) =>
+        character.toUpperCase(),
+    );
 }
 
 
 function formatRelativeTime(
   value: string | null,
 ): string {
-
   if (!value) {
     return "No activity";
   }
 
-
   const timestamp =
-    new Date(
-      value,
-    );
-
+    new Date(value);
 
   if (
     Number.isNaN(
@@ -209,17 +96,12 @@ function formatRelativeTime(
     return "Unknown time";
   }
 
-
   const difference =
     timestamp.getTime()
     - Date.now();
 
-
   const absolute =
-    Math.abs(
-      difference,
-    );
-
+    Math.abs(difference);
 
   const formatter =
     new Intl.RelativeTimeFormat(
@@ -230,7 +112,6 @@ function formatRelativeTime(
       },
     );
 
-
   const minute =
     60 * 1000;
 
@@ -240,47 +121,31 @@ function formatRelativeTime(
   const day =
     24 * hour;
 
-
-  if (
-    absolute
-    < minute
-  ) {
+  if (absolute < minute) {
     return "just now";
   }
 
-
-  if (
-    absolute
-    < hour
-  ) {
+  if (absolute < hour) {
     return formatter.format(
       Math.round(
-        difference
-        / minute,
+        difference / minute,
       ),
       "minute",
     );
   }
 
-
-  if (
-    absolute
-    < day
-  ) {
+  if (absolute < day) {
     return formatter.format(
       Math.round(
-        difference
-        / hour,
+        difference / hour,
       ),
       "hour",
     );
   }
 
-
   return formatter.format(
     Math.round(
-      difference
-      / day,
+      difference / day,
     ),
     "day",
   );
@@ -290,16 +155,13 @@ function formatRelativeTime(
 function statusClasses(
   status: TicketStatus,
 ): string {
-
   switch (status) {
-
     case "REVIEW_REQUIRED":
       return (
         "border-amber-200 "
         + "bg-amber-50 "
         + "text-amber-800"
       );
-
 
     case "FAILED":
       return (
@@ -308,14 +170,12 @@ function statusClasses(
         + "text-red-700"
       );
 
-
     case "WAITING_CUSTOMER":
       return (
         "border-blue-200 "
         + "bg-blue-50 "
         + "text-blue-700"
       );
-
 
     case "AUTO_RESPONDED":
       return (
@@ -324,15 +184,6 @@ function statusClasses(
         + "text-emerald-700"
       );
 
-
-    case "RESOLVED":
-      return (
-        "border-slate-200 "
-        + "bg-slate-100 "
-        + "text-slate-600"
-      );
-
-
     case "DRAFTED":
       return (
         "border-violet-200 "
@@ -340,6 +191,12 @@ function statusClasses(
         + "text-violet-700"
       );
 
+    case "RESOLVED":
+      return (
+        "border-slate-200 "
+        + "bg-slate-100 "
+        + "text-slate-600"
+      );
 
     default:
       return (
@@ -354,15 +211,12 @@ function statusClasses(
 function priorityClasses(
   priority: TicketPriority,
 ): string {
-
   switch (priority) {
-
     case "P1":
       return (
         "bg-red-100 "
         + "text-red-800"
       );
-
 
     case "P2":
       return (
@@ -370,13 +224,11 @@ function priorityClasses(
         + "text-orange-800"
       );
 
-
     case "P3":
       return (
         "bg-slate-100 "
         + "text-slate-700"
       );
-
 
     case "P4":
       return (
@@ -391,15 +243,12 @@ function confidenceClasses(
   band:
     ConfidenceBand | null,
 ): string {
-
   switch (band) {
-
     case "HIGH":
       return (
         "bg-emerald-50 "
         + "text-emerald-700"
       );
-
 
     case "MEDIUM":
       return (
@@ -407,13 +256,11 @@ function confidenceClasses(
         + "text-amber-700"
       );
 
-
     case "LOW":
       return (
         "bg-red-50 "
         + "text-red-700"
       );
-
 
     default:
       return (
@@ -425,10 +272,8 @@ function confidenceClasses(
 
 
 export default function AgentConsole() {
-
   const router =
     useRouter();
-
 
   const [
     accessToken,
@@ -436,19 +281,13 @@ export default function AgentConsole() {
   ] =
     useState<
       string | null
-    >(
-      null,
-    );
-
+    >(null);
 
   const [
     staffEmail,
     setStaffEmail,
   ] =
-    useState(
-      "",
-    );
-
+    useState("");
 
   const [
     tickets,
@@ -456,41 +295,13 @@ export default function AgentConsole() {
   ] =
     useState<
       AgentQueueItem[]
-    >(
-      [],
-    );
-
+    >([]);
 
   const [
     total,
     setTotal,
   ] =
-    useState(
-      0,
-    );
-
-
-  const [
-    selected,
-    setSelected,
-  ] =
-    useState<
-      AgentTicketDetail | null
-    >(
-      null,
-    );
-
-
-  const [
-    selectedId,
-    setSelectedId,
-  ] =
-    useState<
-      string | null
-    >(
-      null,
-    );
-
+    useState(0);
 
   const [
     statusFilter,
@@ -498,10 +309,7 @@ export default function AgentConsole() {
   ] =
     useState<
       TicketStatus | ""
-    >(
-      "",
-    );
-
+    >("");
 
   const [
     priorityFilter,
@@ -509,10 +317,7 @@ export default function AgentConsole() {
   ] =
     useState<
       TicketPriority | ""
-    >(
-      "",
-    );
-
+    >("");
 
   const [
     channelFilter,
@@ -520,54 +325,31 @@ export default function AgentConsole() {
   ] =
     useState<
       TicketChannel | ""
-    >(
-      "",
-    );
-
+    >("");
 
   const [
     intentFilter,
     setIntentFilter,
   ] =
-    useState(
-      "",
-    );
-
+    useState("");
 
   const [
     includeResolved,
     setIncludeResolved,
   ] =
-    useState(
-      false,
-    );
-
+    useState(false);
 
   const [
     authLoading,
     setAuthLoading,
   ] =
-    useState(
-      true,
-    );
-
+    useState(true);
 
   const [
     queueLoading,
     setQueueLoading,
   ] =
-    useState(
-      true,
-    );
-
-  const [
-    detailLoading,
-    setDetailLoading,
-  ] =
-    useState(
-      false,
-    );
-
+    useState(true);
 
   const [
     error,
@@ -575,9 +357,7 @@ export default function AgentConsole() {
   ] =
     useState<
       string | null
-    >(
-      null,
-    );
+    >(null);
 
 
   const reviewInView =
@@ -588,7 +368,6 @@ export default function AgentConsole() {
             ticket.status
             === "REVIEW_REQUIRED",
         ).length,
-
       [
         tickets,
       ],
@@ -602,11 +381,10 @@ export default function AgentConsole() {
           (ticket) =>
             ticket.priority
               === "P1"
-
-            || ticket.priority
+            ||
+            ticket.priority
               === "P2",
         ).length,
-
       [
         tickets,
       ],
@@ -620,7 +398,6 @@ export default function AgentConsole() {
           (ticket) =>
             !ticket.assignee_name,
         ).length,
-
       [
         tickets,
       ],
@@ -630,25 +407,20 @@ export default function AgentConsole() {
   const handleAuthFailure =
     useCallback(
       async () => {
-
         const supabase =
           getSupabaseBrowserClient();
 
-
         await supabase.auth
           .signOut();
-
 
         setAccessToken(
           null,
         );
 
-
         router.replace(
           "/staff/login",
         );
       },
-
       [
         router,
       ],
@@ -656,19 +428,14 @@ export default function AgentConsole() {
 
 
   useEffect(() => {
-
     let active =
       true;
-
 
     const supabase =
       getSupabaseBrowserClient();
 
-
     async function initializeAuth() {
-
       try {
-
         const {
           data,
           error:
@@ -677,11 +444,9 @@ export default function AgentConsole() {
           await supabase.auth
             .getSession();
 
-
         if (!active) {
           return;
         }
-
 
         if (
           sessionError
@@ -691,16 +456,13 @@ export default function AgentConsole() {
           router.replace(
             "/staff/login",
           );
-
           return;
         }
-
 
         setAccessToken(
           data.session
             .access_token,
         );
-
 
         setStaffEmail(
           data.session
@@ -708,9 +470,7 @@ export default function AgentConsole() {
             .email
           ?? "",
         );
-
       } finally {
-
         if (active) {
           setAuthLoading(
             false,
@@ -718,7 +478,6 @@ export default function AgentConsole() {
         }
       }
     }
-
 
     const {
       data: {
@@ -731,33 +490,25 @@ export default function AgentConsole() {
             _event,
             session,
           ) => {
-
             if (!active) {
               return;
             }
 
-
             if (!session) {
-
               setAccessToken(
                 null,
               );
 
-
               router.replace(
                 "/staff/login",
               );
-
-
               return;
             }
-
 
             setAccessToken(
               session
                 .access_token,
             );
-
 
             setStaffEmail(
               session
@@ -768,18 +519,14 @@ export default function AgentConsole() {
           },
         );
 
-
     void initializeAuth();
 
-
     return () => {
-
       active = false;
 
       subscription
         .unsubscribe();
     };
-
   }, [
     router,
   ]);
@@ -788,43 +535,33 @@ export default function AgentConsole() {
   const fetchQueue =
     useCallback(
       async () => {
-
         if (!accessToken) {
           return null;
         }
 
-
         return getAgentQueue(
           accessToken,
-
           {
             status:
               statusFilter
               || undefined,
-
             priority:
               priorityFilter
               || undefined,
-
             intent:
               intentFilter
               || undefined,
-
             channel:
               channelFilter
               || undefined,
-
             includeResolved,
-
             limit:
               100,
-
             offset:
               0,
           },
         );
       },
-
       [
         accessToken,
         channelFilter,
@@ -836,8 +573,35 @@ export default function AgentConsole() {
     );
 
 
-  useEffect(() => {
+  const refreshQueue =
+    useCallback(
+      async () => {
+        const result =
+          await fetchQueue();
 
+        if (!result) {
+          return;
+        }
+
+        setTickets(
+          result.items,
+        );
+
+        setTotal(
+          result.total,
+        );
+
+        setError(
+          null,
+        );
+      },
+      [
+        fetchQueue,
+      ],
+    );
+
+
+  useEffect(() => {
     if (
       authLoading
       ||
@@ -846,15 +610,12 @@ export default function AgentConsole() {
       return;
     }
 
-
     let cancelled =
       false;
-
 
     void fetchQueue()
       .then(
         (result) => {
-
           if (
             cancelled
             ||
@@ -863,16 +624,13 @@ export default function AgentConsole() {
             return;
           }
 
-
           setTickets(
             result.items,
           );
 
-
           setTotal(
             result.total,
           );
-
 
           setError(
             null,
@@ -881,43 +639,33 @@ export default function AgentConsole() {
       )
       .catch(
         (caught) => {
-
           if (cancelled) {
             return;
           }
 
-
           if (
             caught
               instanceof StaffApiError
-
             &&
             (
               caught.status
                 === 401
-
               ||
               caught.status
                 === 403
             )
           ) {
             void handleAuthFailure();
-
             return;
           }
 
-
           setError(
-            (
-              "The support queue "
-              + "could not be loaded."
-            ),
+            "The support queue could not be loaded.",
           );
         },
       )
       .finally(
         () => {
-
           if (!cancelled) {
             setQueueLoading(
               false,
@@ -926,11 +674,9 @@ export default function AgentConsole() {
         },
       );
 
-
     return () => {
       cancelled = true;
     };
-
   }, [
     accessToken,
     authLoading,
@@ -939,156 +685,34 @@ export default function AgentConsole() {
   ]);
 
 
-  async function openTicket(
-    ticketId: string,
-  ) {
-
-    if (!accessToken) {
-      return;
-    }
-
-
-    setSelectedId(
-      ticketId,
-    );
-
-
-    setDetailLoading(
-      true,
-    );
-
-
-    setError(
-      null,
-    );
-
-
-    try {
-
-      const detail =
-        await getAgentTicket(
-          accessToken,
-          ticketId,
-        );
-
-
-      setSelected(
-        detail,
-      );
-
-    } catch (caught) {
-
-      if (
-        caught
-          instanceof StaffApiError
-
-        &&
-        (
-          caught.status
-            === 401
-
-          ||
-          caught.status
-            === 403
-        )
-      ) {
-        await handleAuthFailure();
-
-        return;
-      }
-
-
-      setError(
-        (
-          "The ticket workspace "
-          + "could not be loaded."
-        ),
-      );
-
-    } finally {
-
-      setDetailLoading(
-        false,
-      );
-    }
-  }
-
-
-  async function refreshWorkspace() {
-
-    if (!accessToken) {
-      return;
-    }
-
-
+  async function handleRefresh() {
     setQueueLoading(
-    
       true,
     );
 
-
-    setError(
-      null,
-    );
-
-
     try {
-
-      const result =
-        await fetchQueue();
-
-
-      if (result) {
-
-        setTickets(
-          result.items,
-        );
-
-
-        setTotal(
-          result.total,
-        );
-      }
-
-
-      if (selectedId) {
-
-        await openTicket(
-          selectedId,
-        );
-      }
-
+      await refreshQueue();
     } catch (caught) {
-
       if (
         caught
           instanceof StaffApiError
-
         &&
         (
           caught.status
             === 401
-
           ||
           caught.status
             === 403
         )
       ) {
         await handleAuthFailure();
-
         return;
       }
 
-
       setError(
-        (
-          "The support workspace "
-          + "could not be refreshed."
-        ),
+        "The support queue could not be refreshed.",
       );
-
     } finally {
-
       setQueueLoading(
         false,
       );
@@ -1097,288 +721,67 @@ export default function AgentConsole() {
 
 
   function clearFilters() {
-
-    setStatusFilter(
-      "",
-    );
-
-    setPriorityFilter(
-      "",
-    );
-
-    setChannelFilter(
-      "",
-    );
-
-    setIntentFilter(
-      "",
-    );
-
-    setIncludeResolved(
-      false,
-    );
-  }
-
-
-  async function logout() {
-
-    const supabase =
-      getSupabaseBrowserClient();
-
-
-    await supabase.auth
-      .signOut();
-
-
-    setAccessToken(
-      null,
-    );
-
-
-    router.replace(
-      "/staff/login",
-    );
+    setStatusFilter("");
+    setPriorityFilter("");
+    setChannelFilter("");
+    setIntentFilter("");
+    setIncludeResolved(false);
   }
 
 
   if (authLoading) {
-
     return (
       <div
         className={
           "flex min-h-screen "
-          + "items-center justify-center "
-          + "bg-slate-50 "
-          + "text-sm text-slate-500"
+          + "items-center "
+          + "justify-center "
+          + "bg-slate-100 "
+          + "text-sm "
+          + "text-slate-500"
         }
       >
-        Loading staff console...
+        Loading support queue...
       </div>
     );
   }
 
 
   return (
-    <main
-      className={
-        "min-h-screen "
-        + "bg-slate-50 "
-        + "text-slate-950"
+    <StaffShell
+      active="queue"
+      title="Support queue"
+      subtitle={
+        (
+          total
+          + " matching tickets · "
+          + reviewInView
+          + " need review · "
+          + urgentInView
+          + " high priority"
+        )
+      }
+      staffEmail={
+        staffEmail
+      }
+      onRefresh={
+        () =>
+          void handleRefresh()
+      }
+      refreshBusy={
+        queueLoading
       }
     >
-
-      <header
+      <div
         className={
-          "border-b "
-          + "border-slate-200 "
-          + "bg-white"
+          "mx-auto max-w-[1500px] "
+          + "space-y-4 "
+          + "p-4 "
+          + "sm:p-5 "
+          + "xl:p-6"
         }
       >
-
-        <div
-          className={
-            "mx-auto flex "
-            + "max-w-[1600px] "
-            + "items-center "
-            + "justify-between "
-            + "gap-5 "
-            + "px-5 py-4 "
-            + "lg:px-7"
-          }
-        >
-
-          <div
-            className={
-              "flex items-center "
-              + "gap-3"
-            }
-          >
-
-            <div
-              className={
-                "flex h-10 w-10 "
-                + "items-center "
-                + "justify-center "
-                + "rounded-xl "
-                + "bg-slate-950 "
-                + "text-sm font-bold "
-                + "text-white"
-              }
-            >
-              SP
-            </div>
-
-
-            <div>
-
-              <p
-                className={
-                  "text-[11px] "
-                  + "font-semibold "
-                  + "uppercase "
-                  + "tracking-[0.18em] "
-                  + "text-slate-400"
-                }
-              >
-                SupportPilot AI
-              </p>
-
-
-              <h1
-                className={
-                  "mt-0.5 "
-                  + "text-lg "
-                  + "font-semibold "
-                  + "tracking-tight "
-                  + "text-slate-950"
-                }
-              >
-                Agent Console
-              </h1>
-
-            </div>
-
-          </div>
-
-
-          <div
-            className={
-              "flex items-center "
-              + "gap-3"
-            }
-          >
-
-
-
-            <button
-              type="button"
-
-              onClick={
-                () =>
-                  router.push(
-                    "/staff/dashboard",
-                  )
-              }
-
-              className={
-                "rounded-xl "
-                + "border border-slate-200 "
-                + "bg-white "
-                + "px-4 py-2 "
-                + "text-sm font-medium "
-                + "text-slate-700 "
-                + "transition "
-                + "hover:bg-slate-50"
-              }
-            >
-              Dashboard
-            </button>
-
-            <button
-              type="button"
-
-              disabled={
-                queueLoading
-                || detailLoading
-              }
-
-              onClick={
-                () =>
-                  void refreshWorkspace()
-              }
-
-              className={
-                "hidden rounded-xl "
-                + "border border-slate-200 "
-                + "bg-white "
-                + "px-4 py-2 "
-                + "text-sm font-medium "
-                + "text-slate-700 "
-                + "transition "
-                + "hover:bg-slate-50 "
-                + "disabled:opacity-50 "
-                + "sm:block"
-              }
-            >
-              {
-                queueLoading
-                  ? "Refreshing..."
-                  : "Refresh"
-              }
-            </button>
-
-
-            <div
-              className={
-                "hidden text-right "
-                + "sm:block"
-              }
-            >
-
-              <p
-                className={
-                  "text-xs font-medium "
-                  + "text-slate-900"
-                }
-              >
-                Authenticated staff
-              </p>
-
-
-              <p
-                className={
-                  "mt-0.5 "
-                  + "max-w-65 "
-                  + "truncate "
-                  + "text-xs "
-                  + "text-slate-500"
-                }
-              >
-                {staffEmail}
-              </p>
-
-            </div>
-
-
-            <button
-              type="button"
-
-              onClick={
-                () =>
-                  void logout()
-              }
-
-              className={
-                "rounded-xl "
-                + "border border-slate-200 "
-                + "bg-white "
-                + "px-4 py-2 "
-                + "text-sm font-medium "
-                + "text-slate-700 "
-                + "transition "
-                + "hover:bg-slate-50"
-              }
-            >
-              Sign out
-            </button>
-
-          </div>
-
-        </div>
-
-      </header>
-
-
-      {error && (
-        <div
-          className={
-            "mx-auto "
-            + "max-w-[1600px] "
-            + "px-5 pt-5 "
-            + "lg:px-7"
-          }
-        >
-
+        {error && (
           <div
             role="alert"
             className={
@@ -1386,143 +789,73 @@ export default function AgentConsole() {
               + "border border-red-200 "
               + "bg-red-50 "
               + "px-4 py-3 "
-              + "text-sm text-red-800"
+              + "text-sm "
+              + "text-red-800"
             }
           >
             {error}
           </div>
-
-        </div>
-      )}
-
-
-      <div
-        className={
-          "mx-auto grid "
-          + "max-w-[1600px] "
-          + "gap-5 "
-          + "p-5 "
-          + "lg:grid-cols-"
-          + "[420px_minmax(0,1fr)] "
-          + "lg:px-7"
-        }
-      >
+        )}
 
         <section
           className={
-            "overflow-hidden "
-            + "rounded-2xl "
-            + "border border-slate-200 "
+            "rounded-2xl "
+            + "border "
+            + "border-slate-200 "
             + "bg-white "
+            + "p-4 "
             + "shadow-sm"
           }
         >
-
           <div
             className={
-              "border-b "
-              + "border-slate-200 "
-              + "p-4"
+              "flex flex-wrap "
+              + "items-center "
+              + "justify-between "
+              + "gap-4"
             }
           >
-
-            <div
-              className={
-                "flex items-start "
-                + "justify-between "
-                + "gap-4"
-              }
-            >
-
-              <div>
-
-                <p
-                  className={
-                    "text-xs "
-                    + "font-semibold "
-                    + "uppercase "
-                    + "tracking-[0.15em] "
-                    + "text-slate-400"
-                  }
-                >
-                  Operations
-                </p>
-
-
-                <h2
-                  className={
-                    "mt-1 "
-                    + "text-lg "
-                    + "font-semibold "
-                    + "text-slate-950"
-                  }
-                >
-                  Support queue
-                </h2>
-
-              </div>
-
-
-              <div
+            <div>
+              <p
                 className={
-                  "rounded-xl "
-                  + "bg-slate-100 "
-                  + "px-3 py-2 "
-                  + "text-right"
+                  "text-[10px] "
+                  + "font-bold "
+                  + "uppercase "
+                  + "tracking-[0.16em] "
+                  + "text-slate-400"
                 }
               >
+                Live work
+              </p>
 
-                <p
-                  className={
-                    "text-lg "
-                    + "font-semibold "
-                    + "leading-none "
-                    + "text-slate-950"
-                  }
-                >
-                  {total}
-                </p>
-
-
-                <p
-                  className={
-                    "mt-1 "
-                    + "text-[10px] "
-                    + "font-medium "
-                    + "uppercase "
-                    + "tracking-wide "
-                    + "text-slate-500"
-                  }
-                >
-                  Matching
-                </p>
-
-              </div>
-
+              <h2
+                className={
+                  "mt-1 text-lg "
+                  + "font-semibold"
+                }
+              >
+                Tickets
+              </h2>
             </div>
 
-
             <div
               className={
-                "mt-4 grid "
-                + "grid-cols-3 gap-2"
+                "grid grid-cols-3 "
+                + "gap-2"
               }
             >
-
               <div
                 className={
                   "rounded-xl "
-                  + "border border-slate-200 "
                   + "bg-slate-50 "
-                  + "p-3"
+                  + "px-3 py-2 "
+                  + "text-center"
                 }
               >
-
                 <p
                   className={
                     "text-lg "
-                    + "font-semibold "
-                    + "text-slate-950"
+                    + "font-semibold"
                   }
                 >
                   {reviewInView}
@@ -1530,33 +863,28 @@ export default function AgentConsole() {
 
                 <p
                   className={
-                    "mt-0.5 "
-                    + "text-[10px] "
+                    "text-[9px] "
                     + "uppercase "
                     + "tracking-wide "
-                    + "text-slate-500"
+                    + "text-slate-400"
                   }
                 >
-                  Review in view
+                  Review
                 </p>
-
               </div>
-
 
               <div
                 className={
                   "rounded-xl "
-                  + "border border-slate-200 "
                   + "bg-slate-50 "
-                  + "p-3"
+                  + "px-3 py-2 "
+                  + "text-center"
                 }
               >
-
                 <p
                   className={
                     "text-lg "
-                    + "font-semibold "
-                    + "text-slate-950"
+                    + "font-semibold"
                   }
                 >
                   {urgentInView}
@@ -1564,33 +892,28 @@ export default function AgentConsole() {
 
                 <p
                   className={
-                    "mt-0.5 "
-                    + "text-[10px] "
+                    "text-[9px] "
                     + "uppercase "
                     + "tracking-wide "
-                    + "text-slate-500"
+                    + "text-slate-400"
                   }
                 >
-                  P1/P2 in view
+                  P1/P2
                 </p>
-
               </div>
-
 
               <div
                 className={
                   "rounded-xl "
-                  + "border border-slate-200 "
                   + "bg-slate-50 "
-                  + "p-3"
+                  + "px-3 py-2 "
+                  + "text-center"
                 }
               >
-
                 <p
                   className={
                     "text-lg "
-                    + "font-semibold "
-                    + "text-slate-950"
+                    + "font-semibold"
                   }
                 >
                   {unassignedInView}
@@ -1598,1779 +921,643 @@ export default function AgentConsole() {
 
                 <p
                   className={
-                    "mt-0.5 "
-                    + "text-[10px] "
+                    "text-[9px] "
                     + "uppercase "
                     + "tracking-wide "
-                    + "text-slate-500"
+                    + "text-slate-400"
                   }
                 >
                   Unassigned
                 </p>
-
               </div>
-
             </div>
-
-
-            <div
-              className={
-                "mt-4 grid "
-                + "grid-cols-2 gap-2"
-              }
-            >
-
-              <select
-                aria-label={
-                  "Ticket status"
-                }
-
-                value={
-                  statusFilter
-                }
-
-                onChange={
-                  (event) => {
-
-                    const value =
-                      event
-                        .target
-                        .value as
-                        TicketStatus
-                        | "";
-
-
-                    setStatusFilter(
-                      value,
-                    );
-
-
-                    if (
-                      value
-                      === "RESOLVED"
-                    ) {
-                      setIncludeResolved(
-                        true,
-                      );
-                    }
-                  }
-                }
-
-                className={
-                  "rounded-xl "
-                  + "border border-slate-200 "
-                  + "bg-white "
-                  + "px-3 py-2.5 "
-                  + "text-xs "
-                  + "text-slate-700 "
-                  + "outline-none "
-                  + "focus:border-slate-400"
-                }
-              >
-
-                <option value="">
-                  All statuses
-                </option>
-
-                {
-                  STATUS_OPTIONS.map(
-                    (option) => (
-                      <option
-                        key={
-                          option.value
-                        }
-                        value={
-                          option.value
-                        }
-                      >
-                        {option.label}
-                      </option>
-                    ),
-                  )
-                }
-
-              </select>
-
-
-              <select
-                aria-label={
-                  "Ticket priority"
-                }
-
-                value={
-                  priorityFilter
-                }
-
-                onChange={
-                  (event) =>
-                    setPriorityFilter(
-                      event
-                        .target
-                        .value as
-                        TicketPriority
-                        | "",
-                    )
-                }
-
-                className={
-                  "rounded-xl "
-                  + "border border-slate-200 "
-                  + "bg-white "
-                  + "px-3 py-2.5 "
-                  + "text-xs "
-                  + "text-slate-700 "
-                  + "outline-none "
-                  + "focus:border-slate-400"
-                }
-              >
-
-                <option value="">
-                  All priorities
-                </option>
-
-                <option value="P1">
-                  P1
-                </option>
-
-                <option value="P2">
-                  P2
-                </option>
-
-                <option value="P3">
-                  P3
-                </option>
-
-                <option value="P4">
-                  P4
-                </option>
-
-              </select>
-
-
-              <select
-                aria-label={
-                  "Ticket intent"
-                }
-
-                value={
-                  intentFilter
-                }
-
-                onChange={
-                  (event) =>
-                    setIntentFilter(
-                      event
-                        .target
-                        .value,
-                    )
-                }
-
-                className={
-                  "rounded-xl "
-                  + "border border-slate-200 "
-                  + "bg-white "
-                  + "px-3 py-2.5 "
-                  + "text-xs "
-                  + "text-slate-700 "
-                  + "outline-none "
-                  + "focus:border-slate-400"
-                }
-              >
-
-                <option value="">
-                  All intents
-                </option>
-
-                {
-                  INTENT_OPTIONS.map(
-                    (option) => (
-                      <option
-                        key={
-                          option.value
-                        }
-                        value={
-                          option.value
-                        }
-                      >
-                        {option.label}
-                      </option>
-                    ),
-                  )
-                }
-
-              </select>
-
-
-              <select
-                aria-label={
-                  "Ticket channel"
-                }
-
-                value={
-                  channelFilter
-                }
-
-                onChange={
-                  (event) =>
-                    setChannelFilter(
-                      event
-                        .target
-                        .value as
-                        TicketChannel
-                        | "",
-                    )
-                }
-
-                className={
-                  "rounded-xl "
-                  + "border border-slate-200 "
-                  + "bg-white "
-                  + "px-3 py-2.5 "
-                  + "text-xs "
-                  + "text-slate-700 "
-                  + "outline-none "
-                  + "focus:border-slate-400"
-                }
-              >
-
-                <option value="">
-                  All channels
-                </option>
-
-                <option value="chat">
-                  Chat
-                </option>
-
-                <option value="email">
-                  Email
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div
-              className={
-                "mt-3 flex "
-                + "items-center "
-                + "justify-between "
-                + "gap-3"
-              }
-            >
-
-              <label
-                className={
-                  "flex cursor-pointer "
-                  + "items-center "
-                  + "gap-2 "
-                  + "text-xs "
-                  + "text-slate-600"
-                }
-              >
-
-                <input
-                  type="checkbox"
-
-                  checked={
-                    includeResolved
-                  }
-
-                  onChange={
-                    (event) => {
-
-                      const checked =
-                        event
-                          .target
-                          .checked;
-
-
-                      setIncludeResolved(
-                        checked,
-                      );
-
-
-                      if (
-                        !checked
-                        &&
-                        statusFilter
-                          === "RESOLVED"
-                      ) {
-                        setStatusFilter(
-                          "",
-                        );
-                      }
-                    }
-                  }
-
-                  className={
-                    "h-4 w-4 "
-                    + "rounded "
-                    + "border-slate-300"
-                  }
-                />
-
-                Include resolved
-
-              </label>
-
-
-              <button
-                type="button"
-
-                onClick={
-                  clearFilters
-                }
-
-                className={
-                  "text-xs "
-                  + "font-medium "
-                  + "text-slate-500 "
-                  + "transition "
-                  + "hover:text-slate-900"
-                }
-              >
-                Clear filters
-              </button>
-
-            </div>
-
           </div>
-
 
           <div
             className={
-              "max-h-[calc(100vh-310px)] "
-              + "min-h-105 "
-              + "overflow-y-auto"
+              "mt-4 grid "
+              + "gap-2 "
+              + "sm:grid-cols-2 "
+              + "xl:grid-cols-4"
             }
           >
+            <select
+              aria-label={
+                "Ticket status"
+              }
+              value={
+                statusFilter
+              }
+              onChange={
+                (event) => {
+                  const value =
+                    event
+                      .target
+                      .value as
+                      TicketStatus | "";
 
-            {queueLoading && (
-              <div
-                className={
-                  "border-b "
-                  + "border-slate-100 "
-                  + "px-4 py-3 "
-                  + "text-xs "
-                  + "text-slate-400"
-                }
-              >
-                Refreshing queue...
-              </div>
-            )}
-
-
-            {
-              !queueLoading
-              &&
-              tickets.length === 0
-              &&
-              (
-                <div
-                  className={
-                    "px-8 py-16 "
-                    + "text-center"
-                  }
-                >
-
-                  <p
-                    className={
-                      "font-medium "
-                      + "text-slate-800"
-                    }
-                  >
-                    Queue is clear
-                  </p>
-
-
-                  <p
-                    className={
-                      "mt-2 "
-                      + "text-sm "
-                      + "leading-6 "
-                      + "text-slate-500"
-                    }
-                  >
-                    No tickets match the
-                    current filters.
-                  </p>
-
-                </div>
-              )
-            }
-
-
-            {
-              tickets.map(
-                (ticket) => {
-
-                  const active =
-                    ticket.id
-                    === selectedId;
-
-
-                  return (
-                    <button
-                      type="button"
-
-                      key={
-                        ticket.id
-                      }
-
-                      aria-pressed={
-                        active
-                      }
-
-                      onClick={
-                        () =>
-                          void openTicket(
-                            ticket.id,
-                          )
-                      }
-
-                      className={[
-                        (
-                          "block w-full "
-                          + "border-b "
-                          + "border-slate-100 "
-                          + "p-4 text-left "
-                          + "transition"
-                        ),
-
-                        active
-                          ? (
-                            "bg-slate-950 "
-                            + "text-white"
-                          )
-                          : (
-                            "bg-white "
-                            + "hover:bg-slate-50"
-                          ),
-                      ].join(
-                        " ",
-                      )}
-                    >
-
-                      <div
-                        className={
-                          "flex "
-                          + "items-start "
-                          + "justify-between "
-                          + "gap-4"
-                        }
-                      >
-
-                        <div
-                          className="min-w-0"
-                        >
-
-                          <div
-                            className={
-                              "flex "
-                              + "flex-wrap "
-                              + "items-center "
-                              + "gap-2"
-                            }
-                          >
-
-                            <p
-                              className={[
-                                (
-                                  "text-sm "
-                                  + "font-semibold"
-                                ),
-
-                                active
-                                  ? "text-white"
-                                  : "text-slate-950",
-                              ].join(
-                                " ",
-                              )}
-                            >
-                              {ticket.reference}
-                            </p>
-
-
-                            <span
-                              className={[
-                                (
-                                  "rounded-full "
-                                  + "border "
-                                  + "px-2 py-0.5 "
-                                  + "text-[10px] "
-                                  + "font-semibold"
-                                ),
-
-                                active
-                                  ? (
-                                    "border-white/20 "
-                                    + "bg-white/10 "
-                                    + "text-white"
-                                  )
-                                  : statusClasses(
-                                      ticket.status,
-                                    ),
-                              ].join(
-                                " ",
-                              )}
-                            >
-                              {
-                                humanize(
-                                  ticket.status,
-                                )
-                              }
-                            </span>
-
-                          </div>
-
-
-                          <p
-                            className={[
-                              (
-                                "mt-1.5 "
-                                + "truncate "
-                                + "text-xs"
-                              ),
-
-                              active
-                                ? "text-slate-300"
-                                : "text-slate-500",
-                            ].join(
-                              " ",
-                            )}
-                          >
-                            {
-                              ticket.customer_name
-                              ?? ticket.customer_email
-                              ?? "Unverified customer"
-                            }
-                          </p>
-
-                        </div>
-
-
-                        <span
-                          className={[
-                            (
-                              "shrink-0 "
-                              + "rounded-lg "
-                              + "px-2 py-1 "
-                              + "text-[11px] "
-                              + "font-bold"
-                            ),
-
-                            active
-                              ? (
-                                "bg-white/10 "
-                                + "text-white"
-                              )
-                              : priorityClasses(
-                                  ticket.priority,
-                                ),
-                          ].join(
-                            " ",
-                          )}
-                        >
-                          {ticket.priority}
-                        </span>
-
-                      </div>
-
-
-                      <p
-                        className={[
-                          (
-                            "mt-3 "
-                            + "line-clamp-2 "
-                            + "text-sm "
-                            + "leading-5"
-                          ),
-
-                          active
-                            ? "text-slate-200"
-                            : "text-slate-600",
-                        ].join(
-                          " ",
-                        )}
-                      >
-                        {
-                          ticket.last_message_body
-                          ?? "No messages"
-                        }
-                      </p>
-
-
-                      <div
-                        className={
-                          "mt-3 flex "
-                          + "flex-wrap "
-                          + "items-center "
-                          + "gap-2"
-                        }
-                      >
-
-                        <span
-                          className={[
-                            (
-                              "rounded-full "
-                              + "px-2 py-1 "
-                              + "text-[10px] "
-                              + "font-medium"
-                            ),
-
-                            active
-                              ? (
-                                "bg-white/10 "
-                                + "text-slate-200"
-                              )
-                              : (
-                                "bg-slate-100 "
-                                + "text-slate-600"
-                              ),
-                          ].join(
-                            " ",
-                          )}
-                        >
-                          {
-                            humanize(
-                              ticket.intent,
-                            )
-                          }
-                        </span>
-
-
-                        <span
-                          className={[
-                            (
-                              "rounded-full "
-                              + "px-2 py-1 "
-                              + "text-[10px] "
-                              + "font-medium"
-                            ),
-
-                            active
-                              ? (
-                                "bg-white/10 "
-                                + "text-slate-200"
-                              )
-                              : confidenceClasses(
-                                  ticket.confidence_band,
-                                ),
-                          ].join(
-                            " ",
-                          )}
-                        >
-                          {
-                            ticket.confidence_band
-                            ?? "NOT EVALUATED"
-                          }
-                        </span>
-
-
-                        <span
-                          className={[
-                            (
-                              "ml-auto "
-                              + "text-[10px]"
-                            ),
-
-                            active
-                              ? "text-slate-400"
-                              : "text-slate-400",
-                          ].join(
-                            " ",
-                          )}
-                        >
-                          {
-                            formatRelativeTime(
-                              ticket.last_message_at
-                              ?? ticket.updated_at,
-                            )
-                          }
-                        </span>
-
-                      </div>
-
-
-                      <div
-                        className={[
-                          (
-                            "mt-3 flex "
-                            + "items-center "
-                            + "justify-between "
-                            + "gap-3 "
-                            + "border-t "
-                            + "pt-3 "
-                            + "text-[10px]"
-                          ),
-
-                          active
-                            ? (
-                              "border-white/10 "
-                              + "text-slate-400"
-                            )
-                            : (
-                              "border-slate-100 "
-                              + "text-slate-400"
-                            ),
-                        ].join(
-                          " ",
-                        )}
-                      >
-
-                        <span>
-                          {
-                            humanize(
-                              ticket.channel,
-                            )
-                          }
-                          {" / "}
-                          {
-                            ticket.message_count
-                          }
-                          {
-                            ticket.message_count
-                              === 1
-                              ? " message"
-                              : " messages"
-                          }
-                        </span>
-
-
-                        <span
-                          className="truncate"
-                        >
-                          {
-                            ticket.assignee_name
-                            ?? "Unassigned"
-                          }
-                        </span>
-
-                      </div>
-
-                    </button>
+                  setStatusFilter(
+                    value,
                   );
-                },
-              )
-            }
 
+                  if (
+                    value
+                    === "RESOLVED"
+                  ) {
+                    setIncludeResolved(
+                      true,
+                    );
+                  }
+                }
+              }
+              className={
+                "rounded-xl "
+                + "border "
+                + "border-slate-200 "
+                + "bg-white "
+                + "px-3 py-2.5 "
+                + "text-xs "
+                + "text-slate-700 "
+                + "outline-none "
+                + "focus:border-slate-400"
+              }
+            >
+              <option value="">
+                All statuses
+              </option>
+
+              {STATUS_OPTIONS.map(
+                (option) => (
+                  <option
+                    key={
+                      option.value
+                    }
+                    value={
+                      option.value
+                    }
+                  >
+                    {option.label}
+                  </option>
+                ),
+              )}
+            </select>
+
+            <select
+              aria-label={
+                "Ticket priority"
+              }
+              value={
+                priorityFilter
+              }
+              onChange={
+                (event) =>
+                  setPriorityFilter(
+                    event
+                      .target
+                      .value as
+                      TicketPriority | "",
+                  )
+              }
+              className={
+                "rounded-xl "
+                + "border "
+                + "border-slate-200 "
+                + "bg-white "
+                + "px-3 py-2.5 "
+                + "text-xs "
+                + "text-slate-700 "
+                + "outline-none "
+                + "focus:border-slate-400"
+              }
+            >
+              <option value="">
+                All priorities
+              </option>
+              <option value="P1">
+                P1
+              </option>
+              <option value="P2">
+                P2
+              </option>
+              <option value="P3">
+                P3
+              </option>
+              <option value="P4">
+                P4
+              </option>
+            </select>
+
+            <select
+              aria-label={
+                "Ticket intent"
+              }
+              value={
+                intentFilter
+              }
+              onChange={
+                (event) =>
+                  setIntentFilter(
+                    event
+                      .target
+                      .value,
+                  )
+              }
+              className={
+                "rounded-xl "
+                + "border "
+                + "border-slate-200 "
+                + "bg-white "
+                + "px-3 py-2.5 "
+                + "text-xs "
+                + "text-slate-700 "
+                + "outline-none "
+                + "focus:border-slate-400"
+              }
+            >
+              <option value="">
+                All intents
+              </option>
+
+              {INTENT_OPTIONS.map(
+                (option) => (
+                  <option
+                    key={
+                      option.value
+                    }
+                    value={
+                      option.value
+                    }
+                  >
+                    {option.label}
+                  </option>
+                ),
+              )}
+            </select>
+
+            <select
+              aria-label={
+                "Ticket channel"
+              }
+              value={
+                channelFilter
+              }
+              onChange={
+                (event) =>
+                  setChannelFilter(
+                    event
+                      .target
+                      .value as
+                      TicketChannel | "",
+                  )
+              }
+              className={
+                "rounded-xl "
+                + "border "
+                + "border-slate-200 "
+                + "bg-white "
+                + "px-3 py-2.5 "
+                + "text-xs "
+                + "text-slate-700 "
+                + "outline-none "
+                + "focus:border-slate-400"
+              }
+            >
+              <option value="">
+                All channels
+              </option>
+              <option value="chat">
+                Chat
+              </option>
+              <option value="email">
+                Email
+              </option>
+            </select>
           </div>
 
-        </section>
+          <div
+            className={
+              "mt-3 flex "
+              + "items-center "
+              + "justify-between "
+              + "gap-3"
+            }
+          >
+            <label
+              className={
+                "flex cursor-pointer "
+                + "items-center "
+                + "gap-2 "
+                + "text-xs "
+                + "text-slate-600"
+              }
+            >
+              <input
+                type="checkbox"
+                checked={
+                  includeResolved
+                }
+                onChange={
+                  (event) => {
+                    const checked =
+                      event
+                        .target
+                        .checked;
 
+                    setIncludeResolved(
+                      checked,
+                    );
+
+                    if (
+                      !checked
+                      &&
+                      statusFilter
+                        === "RESOLVED"
+                    ) {
+                      setStatusFilter("");
+                    }
+                  }
+                }
+                className={
+                  "h-4 w-4 "
+                  + "rounded "
+                  + "border-slate-300"
+                }
+              />
+
+              Include resolved
+            </label>
+
+            <button
+              type="button"
+              onClick={
+                clearFilters
+              }
+              className={
+                "text-xs "
+                + "font-semibold "
+                + "text-slate-500 "
+                + "transition "
+                + "hover:text-slate-900"
+              }
+            >
+              Reset filters
+            </button>
+          </div>
+        </section>
 
         <section
           className={
-            "min-h-180 "
-            + "overflow-hidden "
+            "overflow-hidden "
             + "rounded-2xl "
-            + "border border-slate-200 "
+            + "border "
+            + "border-slate-200 "
             + "bg-white "
             + "shadow-sm"
           }
         >
+          <div
+            className={
+              "grid "
+              + "border-b "
+              + "border-slate-200 "
+              + "bg-slate-50 "
+              + "px-4 py-3 "
+              + "text-[10px] "
+              + "font-bold "
+              + "uppercase "
+              + "tracking-[0.12em] "
+              + "text-slate-400 "
+              + "lg:grid-cols-"
+              + "[minmax(0,1.6fr)_150px_130px_130px]"
+            }
+          >
+            <span>
+              Ticket
+            </span>
+
+            <span
+              className={
+                "hidden lg:block"
+              }
+            >
+              Customer
+            </span>
+
+            <span
+              className={
+                "hidden lg:block"
+              }
+            >
+              Assignee
+            </span>
+
+            <span
+              className={
+                "hidden lg:block "
+                + "text-right"
+              }
+            >
+              Updated
+            </span>
+          </div>
+
+          {queueLoading && (
+            <div
+              className={
+                "px-5 py-4 "
+                + "text-sm "
+                + "text-slate-400"
+              }
+            >
+              Refreshing queue...
+            </div>
+          )}
 
           {
-            !selected
+            !queueLoading
             &&
-            !detailLoading
+            tickets.length
+              === 0
             &&
             (
               <div
                 className={
-                  "flex min-h-180 "
-                  + "items-center "
-                  + "justify-center "
-                  + "p-8 "
+                  "px-8 py-16 "
                   + "text-center"
                 }
               >
-
-                <div
-                  className="max-w-sm"
+                <p
+                  className={
+                    "font-semibold "
+                    + "text-slate-800"
+                  }
                 >
+                  Queue is clear
+                </p>
 
-                  <div
-                    className={
-                      "mx-auto flex "
-                      + "h-12 w-12 "
-                      + "items-center "
-                      + "justify-center "
-                      + "rounded-2xl "
-                      + "bg-slate-100 "
-                      + "text-sm "
-                      + "font-bold "
-                      + "text-slate-600"
-                    }
-                  >
-                    SP
-                  </div>
-
-
-                  <h2
-                    className={
-                      "mt-5 "
-                      + "text-xl "
-                      + "font-semibold "
-                      + "text-slate-900"
-                    }
-                  >
-                    Select a ticket
-                  </h2>
-
-
-                  <p
-                    className={
-                      "mt-2 "
-                      + "text-sm "
-                      + "leading-6 "
-                      + "text-slate-500"
-                    }
-                  >
-                    Conversation, customer
-                    context, order facts and
-                    decision information will
-                    appear here.
-                  </p>
-
-                </div>
-
+                <p
+                  className={
+                    "mt-2 text-sm "
+                    + "text-slate-500"
+                  }
+                >
+                  No tickets match the
+                  current filters.
+                </p>
               </div>
             )
           }
 
-
-          {detailLoading && (
-            <div
-              className={
-                "flex min-h-180 "
-                + "items-center "
-                + "justify-center "
-                + "text-sm "
-                + "text-slate-500"
-              }
-            >
-              Loading ticket...
-            </div>
-          )}
-
-
-          {
-            selected
-            &&
-            !detailLoading
-            &&
-            (
-              <div>
-
-                <header
+          <div
+            className={
+              "divide-y "
+              + "divide-slate-100"
+            }
+          >
+            {tickets.map(
+              (ticket) => (
+                <button
+                  key={
+                    ticket.id
+                  }
+                  type="button"
+                  onClick={
+                    () =>
+                      router.push(
+                        (
+                          "/staff/tickets/"
+                          + ticket.id
+                        ),
+                      )
+                  }
                   className={
-                    "border-b "
-                    + "border-slate-200 "
-                    + "p-6"
+                    "grid w-full "
+                    + "gap-3 "
+                    + "px-4 py-4 "
+                    + "text-left "
+                    + "transition "
+                    + "hover:bg-slate-50 "
+                    + "lg:grid-cols-"
+                    + "[minmax(0,1.6fr)_150px_130px_130px] "
+                    + "lg:items-center"
                   }
                 >
-
                   <div
                     className={
-                      "flex flex-wrap "
-                      + "items-start "
-                      + "justify-between "
-                      + "gap-6"
+                      "min-w-0"
                     }
                   >
-
-                    <div>
-
-                      <div
+                    <div
+                      className={
+                        "flex flex-wrap "
+                        + "items-center "
+                        + "gap-2"
+                      }
+                    >
+                      <p
                         className={
-                          "flex flex-wrap "
-                          + "items-center "
-                          + "gap-2"
-                        }
-                      >
-
-                        <p
-                          className={
-                            "text-xs "
-                            + "font-semibold "
-                            + "uppercase "
-                            + "tracking-[0.15em] "
-                            + "text-slate-400"
-                          }
-                        >
-                          Ticket
-                        </p>
-
-
-                        <span
-                          className={[
-                            (
-                              "rounded-full "
-                              + "border "
-                              + "px-2 py-0.5 "
-                              + "text-[10px] "
-                              + "font-semibold"
-                            ),
-
-                            statusClasses(
-                              selected.status,
-                            ),
-                          ].join(
-                            " ",
-                          )}
-                        >
-                          {
-                            humanize(
-                              selected.status,
-                            )
-                          }
-                        </span>
-
-
-                        <span
-                          className={[
-                            (
-                              "rounded-lg "
-                              + "px-2 py-1 "
-                              + "text-[10px] "
-                              + "font-bold"
-                            ),
-
-                            priorityClasses(
-                              selected.priority,
-                            ),
-                          ].join(
-                            " ",
-                          )}
-                        >
-                          {selected.priority}
-                        </span>
-
-                      </div>
-
-
-                      <h2
-                        className={
-                          "mt-2 "
-                          + "text-2xl "
+                          "text-sm "
                           + "font-semibold "
-                          + "tracking-tight "
                           + "text-slate-950"
                         }
                       >
-                        {selected.reference}
-                      </h2>
+                        {ticket.reference}
+                      </p>
 
-
-                      <p
-                        className={
-                          "mt-2 "
-                          + "text-sm "
-                          + "text-slate-500"
-                        }
+                      <span
+                        className={[
+                          (
+                            "rounded-full "
+                            + "border "
+                            + "px-2 py-0.5 "
+                            + "text-[9px] "
+                            + "font-semibold"
+                          ),
+                          statusClasses(
+                            ticket.status,
+                          ),
+                        ].join(" ")}
                       >
                         {
                           humanize(
-                            selected.channel,
+                            ticket.status,
                           )
                         }
-                        {" / "}
-                        {
-                          humanize(
-                            selected.intent,
-                          )
-                        }
-                        {" / Updated "}
-                        {
-                          formatRelativeTime(
-                            selected.updated_at,
-                          )
-                        }
-                      </p>
+                      </span>
 
+                      <span
+                        className={[
+                          (
+                            "rounded-md "
+                            + "px-2 py-0.5 "
+                            + "text-[9px] "
+                            + "font-bold"
+                          ),
+                          priorityClasses(
+                            ticket.priority,
+                          ),
+                        ].join(" ")}
+                      >
+                        {ticket.priority}
+                      </span>
                     </div>
 
+                    <p
+                      className={
+                        "mt-2 "
+                        + "line-clamp-1 "
+                        + "text-sm "
+                        + "text-slate-600"
+                      }
+                    >
+                      {
+                        ticket.last_message_body
+                        ?? "No messages yet."
+                      }
+                    </p>
 
                     <div
                       className={
-                        "min-w-55 "
-                        + "rounded-xl "
-                        + "border border-slate-200 "
-                        + "bg-slate-50 "
-                        + "p-4"
+                        "mt-2 flex "
+                        + "flex-wrap "
+                        + "items-center "
+                        + "gap-2 "
+                        + "text-[10px] "
+                        + "text-slate-400"
                       }
                     >
-
-                      <p
-                        className={
-                          "text-xs "
-                          + "font-semibold "
-                          + "uppercase "
-                          + "tracking-wide "
-                          + "text-slate-400"
+                      <span>
+                        {
+                          humanize(
+                            ticket.channel,
+                          )
                         }
-                      >
-                        Customer
-                      </p>
+                      </span>
 
+                      <span>
+                        ·
+                      </span>
 
-                      <p
-                        className={
-                          "mt-2 "
-                          + "font-medium "
-                          + "text-slate-900"
+                      <span>
+                        {
+                          humanize(
+                            ticket.intent,
+                          )
                         }
+                      </span>
+
+                      <span>
+                        ·
+                      </span>
+
+                      <span
+                        className={[
+                          (
+                            "rounded-full "
+                            + "px-2 py-0.5 "
+                            + "font-semibold"
+                          ),
+                          confidenceClasses(
+                            ticket
+                              .confidence_band,
+                          ),
+                        ].join(" ")}
                       >
                         {
-                          selected.customer_name
-                          ?? "Unverified customer"
+                          ticket
+                            .confidence_band
+                          ?? "NOT EVALUATED"
                         }
-                      </p>
-
-
-                      <p
-                        className={
-                          "mt-1 "
-                          + "text-xs "
-                          + "text-slate-500"
-                        }
-                      >
-                        {
-                          selected.customer_email
-                          ?? "No verified email"
-                        }
-                      </p>
-
+                      </span>
                     </div>
-
                   </div>
-
-                </header>
-
-
-                <div
-                  className={
-                    "grid "
-                    + "xl:grid-cols-"
-                    + "[minmax(0,1fr)_350px]"
-                  }
-                >
 
                   <div
                     className={
                       "min-w-0 "
-                      + "border-b "
-                      + "border-slate-200 "
-                      + "p-6 "
-                      + "xl:border-b-0 "
-                      + "xl:border-r"
+                      + "lg:block"
                     }
                   >
-
-                    <div
+                    <p
                       className={
-                        "mb-5 flex "
-                        + "items-center "
-                        + "justify-between "
-                        + "gap-3"
+                        "truncate "
+                        + "text-xs "
+                        + "font-medium "
+                        + "text-slate-700"
                       }
                     >
-
-                      <h3
-                        className={
-                          "font-semibold "
-                          + "text-slate-900"
-                        }
-                      >
-                        Conversation
-                      </h3>
-
-
-                      <span
-                        className={
-                          "text-xs "
-                          + "text-slate-400"
-                        }
-                      >
-                        {
-                          selected.messages.length
-                        }
-                        {
-                          selected.messages.length
-                            === 1
-                            ? " message"
-                            : " messages"
-                        }
-                      </span>
-
-                    </div>
-
-
-                    {
-                      selected.messages.length
-                      === 0
-                      &&
-                      (
-                        <div
-                          className={
-                            "rounded-xl "
-                            + "border "
-                            + "border-dashed "
-                            + "border-slate-200 "
-                            + "p-8 "
-                            + "text-center "
-                            + "text-sm "
-                            + "text-slate-500"
-                          }
-                        >
-                          No conversation
-                          messages are available.
-                        </div>
-                      )
-                    }
-
-
-                    <div
-                      className="space-y-4"
-                    >
-
                       {
-                        selected.messages.map(
-                          (message) => {
-
-                            const customer =
-                              message.sender_type
-                                .toLowerCase()
-                              === "customer";
-
-
-                            return (
-                              <article
-                                key={
-                                  message.id
-                                }
-
-                                className={[
-                                  (
-                                    "rounded-2xl "
-                                    + "p-4 "
-                                    + "text-sm "
-                                    + "leading-6"
-                                  ),
-
-                                  message.is_internal
-                                    ? (
-                                      "border "
-                                      + "border-amber-200 "
-                                      + "bg-amber-50"
-                                    )
-                                    : customer
-                                      ? (
-                                        "mr-8 "
-                                        + "bg-slate-100"
-                                      )
-                                      : (
-                                        "ml-8 "
-                                        + "border "
-                                        + "border-slate-200 "
-                                        + "bg-white"
-                                      ),
-                                ].join(
-                                  " ",
-                                )}
-                              >
-
-                                <div
-                                  className={
-                                    "mb-2 flex "
-                                    + "items-center "
-                                    + "justify-between "
-                                    + "gap-4 "
-                                    + "text-[10px] "
-                                    + "font-medium "
-                                    + "uppercase "
-                                    + "tracking-wide "
-                                    + "text-slate-400"
-                                  }
-                                >
-
-                                  <span>
-                                    {
-                                      message.is_internal
-                                        ? "Internal note"
-                                        : humanize(
-                                            message.sender_type,
-                                          )
-                                    }
-                                  </span>
-
-
-                                  <span
-                                    className={
-                                      "normal-case "
-                                      + "tracking-normal"
-                                    }
-                                  >
-                                    {
-                                      new Date(
-                                        message.sent_at,
-                                      ).toLocaleString()
-                                    }
-                                  </span>
-
-                                </div>
-
-
-                                <p
-                                  className={
-                                    "whitespace-pre-wrap "
-                                    + "text-slate-700"
-                                  }
-                                >
-                                  {message.body}
-                                </p>
-
-                              </article>
-                            );
-                          },
-                        )
+                        ticket.customer_name
+                        ?? "Unverified customer"
                       }
+                    </p>
 
-                    </div>
-
+                    <p
+                      className={
+                        "mt-0.5 "
+                        + "truncate "
+                        + "text-[10px] "
+                        + "text-slate-400"
+                      }
+                    >
+                      {
+                        ticket.customer_email
+                        ?? "No verified email"
+                      }
+                    </p>
                   </div>
 
-
-                  <aside
+                  <p
                     className={
-                      "space-y-6 "
-                      + "bg-slate-50/60 "
-                      + "p-6"
+                      "truncate "
+                      + "text-xs "
+                      + "text-slate-500"
                     }
                   >
+                    {
+                      ticket.assignee_name
+                      ?? "Unassigned"
+                    }
+                  </p>
 
-                    <section>
-
-                      <h3
-                        className={
-                          "text-sm "
-                          + "font-semibold "
-                          + "text-slate-900"
-                        }
-                      >
-                        Decision context
-                      </h3>
-
-
-                      <dl
-                        className={
-                          "mt-4 space-y-3 "
-                          + "text-sm"
-                        }
-                      >
-
-                        <div
-                          className={
-                            "flex "
-                            + "justify-between "
-                            + "gap-4"
-                          }
-                        >
-
-                          <dt
-                            className={
-                              "text-slate-500"
-                            }
-                          >
-                            Intent
-                          </dt>
-
-                          <dd
-                            className={
-                              "text-right "
-                              + "font-medium "
-                              + "text-slate-900"
-                            }
-                          >
-                            {
-                              humanize(
-                                selected.intent,
-                              )
-                            }
-                          </dd>
-
-                        </div>
-
-
-                        <div
-                          className={
-                            "flex "
-                            + "justify-between "
-                            + "gap-4"
-                          }
-                        >
-
-                          <dt
-                            className={
-                              "text-slate-500"
-                            }
-                          >
-                            Confidence
-                          </dt>
-
-                          <dd>
-                            <span
-                              className={[
-                                (
-                                  "rounded-full "
-                                  + "px-2 py-1 "
-                                  + "text-[10px] "
-                                  + "font-semibold"
-                                ),
-
-                                confidenceClasses(
-                                  selected
-                                    .confidence_band,
-                                ),
-                              ].join(
-                                " ",
-                              )}
-                            >
-                              {
-                                selected
-                                  .confidence_band
-                                ?? "NOT EVALUATED"
-                              }
-                            </span>
-                          </dd>
-
-                        </div>
-
-
-                        <div
-                          className={
-                            "flex "
-                            + "justify-between "
-                            + "gap-4"
-                          }
-                        >
-
-                          <dt
-                            className={
-                              "text-slate-500"
-                            }
-                          >
-                            Restricted
-                          </dt>
-
-                          <dd
-                            className={
-                              "font-medium "
-                              + (
-                                selected
-                                  .restricted_action
-                                  ? "text-red-700"
-                                  : "text-slate-900"
-                              )
-                            }
-                          >
-                            {
-                              selected
-                                .restricted_action
-                                ? "Yes"
-                                : "No"
-                            }
-                          </dd>
-
-                        </div>
-
-
-                        <div
-                          className={
-                            "flex "
-                            + "justify-between "
-                            + "gap-4"
-                          }
-                        >
-
-                          <dt
-                            className={
-                              "text-slate-500"
-                            }
-                          >
-                            Assignee
-                          </dt>
-
-                          <dd
-                            className={
-                              "text-right "
-                              + "font-medium "
-                              + "text-slate-900"
-                            }
-                          >
-                            {
-                              selected.assignee_name
-                              ?? "Unassigned"
-                            }
-                          </dd>
-
-                        </div>
-
-                      </dl>
-
-
-                      {
-                        selected.escalation_reason
-                        &&
-                        (
-                          <div
-                            className={
-                              "mt-4 rounded-xl "
-                              + "border "
-                              + "border-amber-200 "
-                              + "bg-amber-50 "
-                              + "p-3"
-                            }
-                          >
-
-                            <p
-                              className={
-                                "text-[10px] "
-                                + "font-semibold "
-                                + "uppercase "
-                                + "tracking-wide "
-                                + "text-amber-700"
-                              }
-                            >
-                              Escalation
-                            </p>
-
-
-                            <p
-                              className={
-                                "mt-1 "
-                                + "text-xs "
-                                + "leading-5 "
-                                + "text-amber-900"
-                              }
-                            >
-                              {
-                                humanize(
-                                  selected
-                                    .escalation_reason,
-                                )
-                              }
-                            </p>
-
-                          </div>
-                        )
-                      }
-
-                    </section>
-
-
-                    <section
+                  <div
+                    className={
+                      "flex items-center "
+                      + "justify-between "
+                      + "gap-3 "
+                      + "lg:justify-end"
+                    }
+                  >
+                    <span
                       className={
-                        "border-t "
-                        + "border-slate-200 "
-                        + "pt-6"
+                        "text-xs "
+                        + "text-slate-400"
                       }
                     >
-
-                      <div
-                        className={
-                          "flex "
-                          + "items-center "
-                          + "justify-between "
-                          + "gap-3"
-                        }
-                      >
-
-                        <h3
-                          className={
-                            "text-sm "
-                            + "font-semibold "
-                            + "text-slate-900"
-                          }
-                        >
-                          Order context
-                        </h3>
-
-
-                        <span
-                          className={
-                            "text-xs "
-                            + "text-slate-400"
-                          }
-                        >
-                          {
-                            selected.orders.length
-                          }
-                        </span>
-
-                      </div>
-
-
                       {
-                        selected.orders.length
-                        === 0
-                        ? (
-                          <p
-                            className={
-                              "mt-3 "
-                              + "text-sm "
-                              + "leading-6 "
-                              + "text-slate-500"
-                            }
-                          >
-                            No verified order
-                            context is attached.
-                          </p>
-                        )
-                        : (
-                          <div
-                            className={
-                              "mt-3 space-y-3"
-                            }
-                          >
-
-                            {
-                              selected.orders.map(
-                                (order) => (
-                                  <div
-                                    key={
-                                      order
-                                        .external_order_id
-                                    }
-
-                                    className={
-                                      "rounded-xl "
-                                      + "border "
-                                      + "border-slate-200 "
-                                      + "bg-white "
-                                      + "p-3"
-                                    }
-                                  >
-
-                                    <div
-                                      className={
-                                        "flex "
-                                        + "items-center "
-                                        + "justify-between "
-                                        + "gap-3"
-                                      }
-                                    >
-
-                                      <p
-                                        className={
-                                          "text-sm "
-                                          + "font-semibold "
-                                          + "text-slate-900"
-                                        }
-                                      >
-                                        {
-                                          order
-                                            .external_order_id
-                                        }
-                                      </p>
-
-
-                                      <span
-                                        className={
-                                          "rounded-full "
-                                          + "bg-slate-100 "
-                                          + "px-2 py-1 "
-                                          + "text-[10px] "
-                                          + "font-medium "
-                                          + "text-slate-600"
-                                        }
-                                      >
-                                        {
-                                          humanize(
-                                            order.status,
-                                          )
-                                        }
-                                      </span>
-
-                                    </div>
-
-
-                                    <p
-                                      className={
-                                        "mt-2 "
-                                        + "text-[10px] "
-                                        + "text-slate-400"
-                                      }
-                                    >
-                                      Retrieved {
-                                        formatRelativeTime(
-                                          order
-                                            .retrieved_at,
-                                        )
-                                      }
-                                    </p>
-
-                                  </div>
-                                ),
-                              )
-                            }
-
-                          </div>
+                        formatRelativeTime(
+                          ticket.last_message_at
+                          ?? ticket.updated_at,
                         )
                       }
+                    </span>
 
-                    </section>
-
-
-                    <section
+                    <span
+                      aria-hidden="true"
                       className={
-                        "border-t "
-                        + "border-slate-200 "
-                        + "pt-6"
+                        "text-lg "
+                        + "text-slate-300"
                       }
                     >
-
-                      <div
-                        className={
-                          "flex "
-                          + "items-center "
-                          + "justify-between "
-                          + "gap-3"
-                        }
-                      >
-
-                        <h3
-                          className={
-                            "text-sm "
-                            + "font-semibold "
-                            + "text-slate-900"
-                          }
-                        >
-                          Recent audit
-                        </h3>
-
-
-                        <span
-                          className={
-                            "text-xs "
-                            + "text-slate-400"
-                          }
-                        >
-                          {
-                            selected
-                              .audit_events
-                              .length
-                          }
-                          {" total"}
-                        </span>
-
-                      </div>
-
-
-                      <div
-                        className={
-                          "mt-4 space-y-3"
-                        }
-                      >
-
-                        {
-                          selected
-                            .audit_events
-                            .slice(
-                              -5,
-                            )
-                            .reverse()
-                            .map(
-                              (event) => (
-                                <div
-                                  key={
-                                    event.id
-                                  }
-
-                                  className={
-                                    "border-l-2 "
-                                    + "border-slate-200 "
-                                    + "pl-3"
-                                  }
-                                >
-
-                                  <p
-                                    className={
-                                      "text-xs "
-                                      + "font-medium "
-                                      + "text-slate-700"
-                                    }
-                                  >
-                                    {
-                                      humanize(
-                                        event
-                                          .event_type,
-                                      )
-                                    }
-                                  </p>
-
-
-                                  <p
-                                    className={
-                                      "mt-1 "
-                                      + "text-[10px] "
-                                      + "text-slate-400"
-                                    }
-                                  >
-                                    {
-                                      event.actor_type
-                                    }
-                                    {" / "}
-                                    {
-                                      formatRelativeTime(
-                                        event.created_at,
-                                      )
-                                    }
-                                  </p>
-
-                                </div>
-                              ),
-                            )
-                        }
-
-
-                        {
-                          selected
-                            .audit_events
-                            .length
-                          === 0
-                          &&
-                          (
-                            <p
-                              className={
-                                "text-sm "
-                                + "text-slate-500"
-                              }
-                            >
-                              No audit events
-                              recorded.
-                            </p>
-                          )
-                        }
-
-                      </div>
-
-                    </section>
-
-                  </aside>
-
-                </div>
-
-              </div>
-            )
-          }
-
+                      →
+                    </span>
+                  </div>
+                </button>
+              ),
+            )}
+          </div>
         </section>
-
       </div>
-
-    </main>
+    </StaffShell>
   );
 }
