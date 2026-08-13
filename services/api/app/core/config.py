@@ -54,6 +54,28 @@ class Settings:
         "",
     )
 
+
+
+    email_outbound_secret: str = os.getenv(
+        "EMAIL_OUTBOUND_SECRET",
+        "",
+    )
+
+    n8n_email_outbound_url: str = os.getenv(
+        "N8N_EMAIL_OUTBOUND_URL",
+        (
+            "http://n8n:5678/webhook/"
+            "supportpilot-email-outbound"
+        ),
+    )
+
+    email_outbound_timeout_seconds: int = int(
+        os.getenv(
+            "EMAIL_OUTBOUND_TIMEOUT_SECONDS",
+            "30",
+        )
+    )
+
     embedding_provider: str = os.getenv(
         "EMBEDDING_PROVIDER",
         "local",

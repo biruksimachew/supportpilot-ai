@@ -47,6 +47,17 @@ from app.services.outbound_delivery import (
     send_agent_reply,
 )
 
+from app.services.outbound_delivery import (
+    DeliveryConfirmedFailureError,
+    DeliveryConflictError,
+    DeliveryProviderUnavailableError,
+    DeliveryTicketNotFoundError,
+    DeliveryUncertainError,
+    send_agent_reply,
+)
+
+
+
 TicketStatus = Literal[
     "NEW",
     "TRIAGED",
@@ -521,6 +532,38 @@ def send_ticket_reply(
             detail={
                 "code":
                     "DELIVERY_PROVIDER_UNAVAILABLE",
+
+                "message":
+                    str(exc),
+            },
+        ) from exc
+
+
+    except DeliveryConfirmedFailureError as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_502_BAD_GATEWAY,
+
+            detail={
+                "code":
+                    "DELIVERY_CONFIRMED_FAILED",
+
+                "message":
+                    str(exc),
+            },
+        ) from exc
+
+
+    except DeliveryUncertainError as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+
+            detail={
+                "code":
+                    "DELIVERY_UNCERTAIN",
 
                 "message":
                     str(exc),

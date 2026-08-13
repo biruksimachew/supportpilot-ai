@@ -22,6 +22,10 @@ services:
 
       EMAIL_INGEST_SECRET: "${EMAIL_INGEST_SECRET}"
 
+      EMAIL_OUTBOUND_SECRET: "${EMAIL_OUTBOUND_SECRET}"
+      N8N_EMAIL_OUTBOUND_URL: "${N8N_EMAIL_OUTBOUND_URL:-http://n8n:5678/webhook/supportpilot-email-outbound}"
+      EMAIL_OUTBOUND_TIMEOUT_SECONDS: "${EMAIL_OUTBOUND_TIMEOUT_SECONDS:-30}"
+
       # ------------------------------------------------------
       # Embeddings
       # ------------------------------------------------------

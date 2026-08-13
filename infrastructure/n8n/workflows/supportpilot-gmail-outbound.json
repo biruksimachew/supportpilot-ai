@@ -1,0 +1,109 @@
+{
+  "name": "SupportPilot - Gmail Outbound",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supportpilot-email-outbound",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bbe81297-91cf-4035-9c3e-f2290fd16bb9",
+      "name": "SupportPilot Outbound Webhook",
+      "webhookId": "c7177213-63b5-4f28-b478-4918b5101b24",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2EioUIKm2ocrz8eS",
+          "name": "SupportPilot Email Outbound"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('SupportPilot Outbound Webhook').item.json.body.message_id }}",
+        "emailType": "text",
+        "message": "={{ $('SupportPilot Outbound Webhook').item.json.body.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "97d3f5c6-6c81-4df3-8c17-7eb06f4c1ab8",
+      "name": "Reply to Customer",
+      "webhookId": "0f15ac60-3db1-442e-95f1-a083cf408bd1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eLSs3ESeGA1O5M8E",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{\n  {\n    status: \"DELIVERED\",\n    provider_message_id: $json.id,\n    provider_thread_id: $json.threadId\n  }\n}}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "81d77c97-6967-471d-b49f-87fb82d98af3",
+      "name": "Confirm Delivery"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "SupportPilot Outbound Webhook": {
+      "main": [
+        [
+          {
+            "node": "Reply to Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to Customer": {
+      "main": [
+        [
+          {
+            "node": "Confirm Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bca935b1-3ced-4e75-b8fe-c85eef99a793",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2878ba7c6bc556da241acc29ce45d4c4880b3d098e423590d0283ee6551fd4e8"
+  },
+  "nodeGroups": [],
+  "id": "6CpIzvhqFkvAlkM5",
+  "tags": []
+}
