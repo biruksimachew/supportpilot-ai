@@ -91,3 +91,47 @@ class AgentWorkflowResponse(BaseModel):
     escalation_reason: str | None = None
 
     resolution_code: str | None = None
+
+class AgentSendReplyRequest(BaseModel):
+    idempotency_key: UUID
+
+    body: str = Field(
+        min_length=1,
+        max_length=12000,
+    )
+
+    @field_validator("body")
+    @classmethod
+    def validate_reply_body(
+        cls,
+        value: str,
+    ) -> str:
+
+        normalized = (
+            value.strip()
+        )
+
+        if not normalized:
+            raise ValueError(
+                "Reply cannot be empty."
+            )
+
+        return normalized
+
+
+class AgentSendReplyResponse(BaseModel):
+    ticket_id: UUID
+
+    delivery_id: UUID
+
+    message_id: UUID | None
+
+    status: str
+
+    ticket_status: str
+
+    channel: str
+
+    edited_from_ai_draft: bool
+
+    idempotent_replay: bool

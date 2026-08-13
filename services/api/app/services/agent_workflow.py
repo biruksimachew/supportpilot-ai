@@ -32,6 +32,25 @@ class AgentWorkflowConflictError(
     pass
 
 
+def _actor_type(
+    user: InternalUser,
+) -> str:
+
+    mapping = {
+        "SUPPORT_AGENT":
+            "AGENT",
+
+        "SUPPORT_MANAGER":
+            "MANAGER",
+
+        "SYSTEM_ADMIN":
+            "ADMIN",
+    }
+
+    return mapping[
+        user.role
+    ]
+
 def _load_ticket_for_update(
     cursor,
     *,
@@ -177,7 +196,7 @@ def _insert_user_audit(
         )
 
         values (
-            'USER',
+            %s,
             %s,
 
             %s,
@@ -189,6 +208,10 @@ def _insert_user_audit(
         );
         """,
         (
+            _actor_type(
+                user
+            ),
+
             str(
                 user.id
             ),
@@ -200,6 +223,7 @@ def _insert_user_audit(
             ),
 
             Jsonb(
+                
                 {
                     "ticket_id":
                         str(

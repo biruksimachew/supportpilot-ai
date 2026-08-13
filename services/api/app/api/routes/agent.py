@@ -28,6 +28,8 @@ from app.schemas.agent_workflow import (
     EscalateTicketRequest,
     InternalNoteRequest,
     ResolveTicketRequest,
+    AgentSendReplyRequest,
+    AgentSendReplyResponse,
 )
 
 from app.services.agent_workflow import (
@@ -38,7 +40,12 @@ from app.services.agent_workflow import (
     escalate_ticket,
     resolve_ticket,
 )
-
+from app.services.outbound_delivery import (
+    DeliveryConflictError,
+    DeliveryProviderUnavailableError,
+    DeliveryTicketNotFoundError,
+    send_agent_reply,
+)
 
 TicketStatus = Literal[
     "NEW",
@@ -438,6 +445,104 @@ def resolve_agent_ticket(
                     (
                         "The ticket could "
                         "not be resolved."
+                    ),
+            },
+        ) from exc
+
+@router.post(
+    "/tickets/{ticket_id}/send",
+    response_model=AgentSendReplyResponse,
+)
+def send_ticket_reply(
+    ticket_id: UUID,
+
+    payload:
+        AgentSendReplyRequest,
+
+    user: InternalUser = Depends(
+        get_current_internal_user
+    ),
+) -> AgentSendReplyResponse:
+
+    try:
+
+        return send_agent_reply(
+            user=user,
+
+            ticket_id=
+                ticket_id,
+
+            idempotency_key=
+                payload.idempotency_key,
+
+            body=
+                payload.body,
+        )
+
+
+    except DeliveryTicketNotFoundError as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_404_NOT_FOUND,
+
+            detail={
+                "code":
+                    "TICKET_NOT_FOUND",
+
+                "message":
+                    str(exc),
+            },
+        ) from exc
+
+
+    except DeliveryConflictError as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_409_CONFLICT,
+
+            detail={
+                "code":
+                    "DELIVERY_CONFLICT",
+
+                "message":
+                    str(exc),
+            },
+        ) from exc
+
+
+    except DeliveryProviderUnavailableError as exc:
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+
+            detail={
+                "code":
+                    "DELIVERY_PROVIDER_UNAVAILABLE",
+
+                "message":
+                    str(exc),
+            },
+        ) from exc
+
+
+    except psycopg.Error as exc:
+
+
+        raise HTTPException(
+            status_code=
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+
+            detail={
+                "code":
+                    "DELIVERY_UNAVAILABLE",
+
+                "message":
+                    (
+                        "The reply could "
+                        "not be delivered."
                     ),
             },
         ) from exc
