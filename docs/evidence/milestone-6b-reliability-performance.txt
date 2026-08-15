@@ -1,0 +1,31 @@
+SupportPilot AI - Milestone 6B Reliability and Performance
+========================================================================
+
+Generated: 2026-08-15T15:43:37.901581+00:00
+
+RELIABILITY
+------------------------------------------------------------------------
+embedding provider failure persisted: PASS
+retrieval contract failure persisted: PASS
+generation provider failure persisted: PASS
+grounding contract failure persisted: PASS
+database readiness contract: PASS
+
+Reliability overall: PASS
+
+PERFORMANCE
+------------------------------------------------------------------------
+Local chat-decision target: 8000 ms
+restricted action decision: p50=96.32 ms | p95=140.48 ms | max=140.48 ms | target=PASS
+prompt injection decision: p50=81.25 ms | p95=108.14 ms | max=108.14 ms | target=PASS
+unverified commerce decision: p50=129.59 ms | p95=177.09 ms | max=177.09 ms | target=PASS
+verified commerce decision: p50=537.93 ms | p95=734.39 ms | max=734.39 ms | target=PASS
+knowledge retrieval only: p50=109.76 ms | p95=1320.32 ms | max=1320.32 ms | target=PASS
+full grounded RAG decision: p50=6042.98 ms | p95=6325.45 ms | max=6325.45 ms | target=PASS
+RAG model generation only: p50=5784.17 ms | p95=5793.09 ms
+
+Performance target overall: PASS
+
+NOTE: A performance target miss is reported as measured evidence. It does not convert a safe failure into a passing latency result.
+
+Measurement complete: True

@@ -38,6 +38,7 @@ from app.services.commerce_lookup import (
 
 from app.services.embeddings import (
     EmbeddingProvider,
+    EmbeddingProviderError,
 )
 
 from app.services.evidence_decision import (
@@ -47,13 +48,16 @@ from app.services.evidence_decision import (
 
 from app.services.generation import (
     GenerationProvider,
+    GenerationProviderError,
 )
 
 from app.services.grounded_answer import (
+    GroundedGenerationConsistencyError,
     generate_grounded_answer,
 )
 
 from app.services.knowledge_retrieval import (
+    KnowledgeRetrievalConsistencyError,
     retrieve_knowledge,
 )
 
@@ -1298,6 +1302,221 @@ def _persist_rag_ai_run(
     return ai_run_id
 
 
+
+def _persist_rag_failure_ai_run(
+    *,
+    user: InternalUser,
+
+    ticket_id: UUID,
+    message_id: UUID,
+
+    classification:
+        SupportRequestClassification,
+
+    provider: str,
+    model: str,
+
+    error_code: str,
+    latency_ms: int,
+
+    retrieval=None,
+
+) -> UUID:
+
+    decision = (
+        UnifiedSafetyDecision(
+            decision=
+                "FAILED",
+
+            ticket_status=
+                "FAILED",
+
+            safe_draft_ready=
+                False,
+
+            reasons=(
+                error_code,
+                "HUMAN_REVIEW_REQUIRED",
+                "AUTO_RESPONSE_BLOCKED",
+            ),
+
+            escalation_reason=
+                error_code,
+        )
+    )
+
+
+    with get_database_connection() as connection:
+
+        connection.row_factory = dict_row
+
+
+        with connection.transaction():
+
+            with connection.cursor() as cursor:
+
+                cursor.execute(
+                    """
+                    insert into public.ai_runs (
+                        ticket_id,
+                        message_id,
+
+                        provider,
+                        model,
+
+                        prompt_version,
+
+                        intent,
+
+                        confidence,
+                        confidence_band,
+
+                        decision,
+                        decision_reasons,
+
+                        latency_ms,
+                        error_code
+                    )
+
+                    values (
+                        %s,
+                        %s,
+
+                        %s,
+                        %s,
+
+                        %s,
+
+                        %s,
+
+                        0.0,
+                        'LOW',
+
+                        'FAILED',
+                        %s,
+
+                        %s,
+                        %s
+                    )
+
+                    returning id;
+                    """,
+                    (
+                        ticket_id,
+                        message_id,
+
+                        provider,
+                        model,
+
+                        PROMPT_VERSION,
+
+                        classification.intent,
+
+                        Jsonb(
+                            list(
+                                decision.reasons
+                            )
+                        ),
+
+                        latency_ms,
+                        error_code,
+                    ),
+                )
+
+
+                ai_run_id = (
+                    cursor.fetchone()[
+                        "id"
+                    ]
+                )
+
+
+                if retrieval is not None:
+
+                    for rank, evidence in enumerate(
+                        retrieval.results,
+                        start=1,
+                    ):
+
+                        cursor.execute(
+                            """
+                            insert into public.retrieval_evidence (
+                                ai_run_id,
+                                chunk_id,
+                                rank,
+                                score
+                            )
+
+                            values (
+                                %s,
+                                %s,
+                                %s,
+                                %s
+                            );
+                            """,
+                            (
+                                ai_run_id,
+
+                                evidence.chunk_id,
+
+                                rank,
+
+                                evidence.similarity,
+                            ),
+                        )
+
+
+                cursor.execute(
+                    """
+                    update public.tickets
+
+                    set
+                        intent = %s,
+                        confidence_band = 'LOW',
+                        status = 'FAILED',
+                        escalation_reason = %s
+
+                    where id = %s;
+                    """,
+                    (
+                        classification.intent,
+
+                        error_code,
+
+                        ticket_id,
+                    ),
+                )
+
+
+                _insert_decision_audit(
+                    cursor,
+
+                    ai_run_id=
+                        ai_run_id,
+
+                    ticket_id=
+                        ticket_id,
+
+                    message_id=
+                        message_id,
+
+                    user=
+                        user,
+
+                    decision=
+                        decision,
+
+                    intent=
+                        classification.intent,
+
+                    commerce_required=
+                        False,
+                )
+
+
+    return ai_run_id
+
+
 def run_ticket_ai_draft(
     *,
     user: InternalUser,
@@ -1328,7 +1547,7 @@ def run_ticket_ai_draft(
 
 
     # ======================================================
-    # Gate 1 — restricted action.
+    # Gate 1 â€” restricted action.
     # ======================================================
 
     restricted_detection = (
@@ -1445,7 +1664,7 @@ def run_ticket_ai_draft(
 
 
     # ======================================================
-    # Gate 2 — a ticket already carrying a restricted action
+    # Gate 2 â€” a ticket already carrying a restricted action
     # stays under human review.
     # ======================================================
 
@@ -1565,7 +1784,7 @@ def run_ticket_ai_draft(
 
 
     # ======================================================
-    # Gate 3 — commerce path.
+    # Gate 3 â€” commerce path.
     # ======================================================
 
     if classification.commerce_required:
@@ -2193,20 +2412,116 @@ def run_ticket_ai_draft(
 
 
     # ======================================================
-    # Gate 4 — normal knowledge/RAG path.
+    # Gate 4 â€” normal knowledge/RAG path.
     # ======================================================
 
-    retrieval = retrieve_knowledge(
-        question=
-            question,
+    try:
 
-        provider=
-            embedding_provider,
+        retrieval = retrieve_knowledge(
+            question=
+                question,
 
-        top_k=5,
+            provider=
+                embedding_provider,
 
-        min_similarity=0.0,
-    )
+            top_k=5,
+
+            min_similarity=0.0,
+        )
+
+
+    except EmbeddingProviderError:
+
+        latency_ms = max(
+            0,
+
+            round(
+                (
+                    perf_counter()
+                    - started_at
+                )
+                * 1000
+            ),
+        )
+
+
+        _persist_rag_failure_ai_run(
+            user=
+                user,
+
+            ticket_id=
+                ticket_id,
+
+            message_id=
+                message_id,
+
+            classification=
+                classification,
+
+            provider=
+                embedding_provider
+                .provider_name,
+
+            model=
+                embedding_provider
+                .model,
+
+            error_code=
+                "EMBEDDING_PROVIDER_ERROR",
+
+            latency_ms=
+                latency_ms,
+        )
+
+
+        raise
+
+
+    except KnowledgeRetrievalConsistencyError:
+
+        latency_ms = max(
+            0,
+
+            round(
+                (
+                    perf_counter()
+                    - started_at
+                )
+                * 1000
+            ),
+        )
+
+
+        _persist_rag_failure_ai_run(
+            user=
+                user,
+
+            ticket_id=
+                ticket_id,
+
+            message_id=
+                message_id,
+
+            classification=
+                classification,
+
+            provider=
+                embedding_provider
+                .provider_name,
+
+            model=
+                embedding_provider
+                .model,
+
+            error_code=
+                "KNOWLEDGE_RETRIEVAL_CONSISTENCY_ERROR",
+
+            latency_ms=
+                latency_ms,
+        )
+
+
+        raise
 
 
     assessment = (
@@ -2224,18 +2539,120 @@ def run_ticket_ai_draft(
         generation_attempted = True
 
 
-        answer = (
-            generate_grounded_answer(
-                question=
-                    question,
+        try:
+
+            answer = (
+                generate_grounded_answer(
+                    question=
+                        question,
+
+                    retrieval=
+                        retrieval,
+
+                    provider=
+                        generation_provider,
+                )
+            )
+
+
+        except GenerationProviderError:
+
+            latency_ms = max(
+                0,
+
+                round(
+                    (
+                        perf_counter()
+                        - started_at
+                    )
+                    * 1000
+                ),
+            )
+
+
+            _persist_rag_failure_ai_run(
+                user=
+                    user,
+
+                ticket_id=
+                    ticket_id,
+
+                message_id=
+                    message_id,
+
+                classification=
+                    classification,
+
+                provider=
+                    generation_provider
+                    .provider_name,
+
+                model=
+                    generation_provider
+                    .model,
+
+                error_code=
+                    "GENERATION_PROVIDER_ERROR",
+
+                latency_ms=
+                    latency_ms,
 
                 retrieval=
                     retrieval,
+            )
+
+
+            raise
+
+
+        except GroundedGenerationConsistencyError:
+
+            latency_ms = max(
+                0,
+
+                round(
+                    (
+                        perf_counter()
+                        - started_at
+                    )
+                    * 1000
+                ),
+            )
+
+
+            _persist_rag_failure_ai_run(
+                user=
+                    user,
+
+                ticket_id=
+                    ticket_id,
+
+                message_id=
+                    message_id,
+
+                classification=
+                    classification,
 
                 provider=
-                    generation_provider,
+                    generation_provider
+                    .provider_name,
+
+                model=
+                    generation_provider
+                    .model,
+
+                error_code=
+                    "GROUNDING_CONSISTENCY_ERROR",
+
+                latency_ms=
+                    latency_ms,
+
+                retrieval=
+                    retrieval,
             )
-        )
+
+
+            raise
 
 
         if (

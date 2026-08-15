@@ -1,0 +1,258 @@
+{
+  "suite": "SupportPilot M6B Reliability and Performance",
+  "version": "m6b-v1",
+  "generated_at": "2026-08-15T15:43:37.901581+00:00",
+  "environment": {
+    "app_environment": "local",
+    "embedding_provider": "local-fastembed",
+    "embedding_model": "BAAI/bge-small-en-v1.5::repeat4-1536",
+    "embedding_dimensions": 1536,
+    "generation_provider": "ollama",
+    "generation_model": "qwen3:1.7b",
+    "commerce_provider": "northstar-commerce-mock",
+    "generation_timeout_seconds": 180,
+    "embedding_timeout_seconds": 30,
+    "commerce_timeout_seconds": 10,
+    "email_outbound_timeout_seconds": 30,
+    "indexed_published_chunks": 9,
+    "dependency_readiness": {
+      "database": true,
+      "pgvector": true
+    },
+    "provider_initialization_ms": {
+      "embedding": 2714.71,
+      "generation": 0.03
+    }
+  },
+  "reliability_probes": [
+    {
+      "name": "embedding provider failure persisted",
+      "passed": true,
+      "expected_error_code": "EMBEDDING_PROVIDER_ERROR",
+      "persisted_run": {
+        "provider": "m6b-failing-embedding",
+        "model": "m6b-failing-embedding-v1",
+        "decision": "FAILED",
+        "confidence_band": "LOW",
+        "decision_reasons": [
+          "EMBEDDING_PROVIDER_ERROR",
+          "HUMAN_REVIEW_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "latency_ms": 179,
+        "error_code": "EMBEDDING_PROVIDER_ERROR"
+      },
+      "exception": "EmbeddingProviderError"
+    },
+    {
+      "name": "retrieval contract failure persisted",
+      "passed": true,
+      "expected_error_code": "KNOWLEDGE_RETRIEVAL_CONSISTENCY_ERROR",
+      "persisted_run": {
+        "provider": "m6b-wrong-dimension",
+        "model": "m6b-wrong-dimension-v1",
+        "decision": "FAILED",
+        "confidence_band": "LOW",
+        "decision_reasons": [
+          "KNOWLEDGE_RETRIEVAL_CONSISTENCY_ERROR",
+          "HUMAN_REVIEW_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "latency_ms": 80,
+        "error_code": "KNOWLEDGE_RETRIEVAL_CONSISTENCY_ERROR"
+      },
+      "exception": "KnowledgeRetrievalConsistencyError"
+    },
+    {
+      "name": "generation provider failure persisted",
+      "passed": true,
+      "expected_error_code": "GENERATION_PROVIDER_ERROR",
+      "persisted_run": {
+        "provider": "m6b-failing-generation",
+        "model": "m6b-failing-generation-v1",
+        "decision": "FAILED",
+        "confidence_band": "LOW",
+        "decision_reasons": [
+          "GENERATION_PROVIDER_ERROR",
+          "HUMAN_REVIEW_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "latency_ms": 133,
+        "error_code": "GENERATION_PROVIDER_ERROR"
+      },
+      "exception": "GenerationProviderError"
+    },
+    {
+      "name": "grounding contract failure persisted",
+      "passed": true,
+      "expected_error_code": "GROUNDING_CONSISTENCY_ERROR",
+      "persisted_run": {
+        "provider": "m6b-bad-grounding",
+        "model": "m6b-bad-grounding-v1",
+        "decision": "FAILED",
+        "confidence_band": "LOW",
+        "decision_reasons": [
+          "GROUNDING_CONSISTENCY_ERROR",
+          "HUMAN_REVIEW_REQUIRED",
+          "AUTO_RESPONSE_BLOCKED"
+        ],
+        "latency_ms": 115,
+        "error_code": "GROUNDING_CONSISTENCY_ERROR"
+      },
+      "exception": "GroundedGenerationConsistencyError"
+    },
+    {
+      "name": "database readiness contract",
+      "passed": true,
+      "dependencies": {
+        "database": true,
+        "pgvector": true
+      }
+    }
+  ],
+  "reliability_pass": true,
+  "performance_target_ms": 8000.0,
+  "warmup": {
+    "full_rag_ms": 90491.88,
+    "result": {
+      "decision": "AUTO_RESPOND",
+      "confidence_band": "HIGH",
+      "generation_attempted": true,
+      "safe_draft_ready": true,
+      "evidence_count": 5,
+      "answer_status": "ANSWERED"
+    }
+  },
+  "benchmarks": [
+    {
+      "name": "restricted action decision",
+      "latency": {
+        "samples": 5,
+        "p50_ms": 96.32,
+        "p95_ms": 140.48,
+        "max_ms": 140.48,
+        "min_ms": 83.63,
+        "mean_ms": 101.5,
+        "target_ms": 8000.0,
+        "p95_target_met": true
+      },
+      "result": {
+        "decision": "REVIEW_REQUIRED",
+        "confidence_band": "LOW",
+        "generation_attempted": false,
+        "safe_draft_ready": false
+      }
+    },
+    {
+      "name": "prompt injection decision",
+      "latency": {
+        "samples": 5,
+        "p50_ms": 81.25,
+        "p95_ms": 108.14,
+        "max_ms": 108.14,
+        "min_ms": 69.07,
+        "mean_ms": 82.8,
+        "target_ms": 8000.0,
+        "p95_target_met": true
+      },
+      "result": {
+        "decision": "REVIEW_REQUIRED",
+        "confidence_band": "LOW",
+        "generation_attempted": false,
+        "safe_draft_ready": false
+      }
+    },
+    {
+      "name": "unverified commerce decision",
+      "latency": {
+        "samples": 5,
+        "p50_ms": 129.59,
+        "p95_ms": 177.09,
+        "max_ms": 177.09,
+        "min_ms": 117.76,
+        "mean_ms": 137.19,
+        "target_ms": 8000.0,
+        "p95_target_met": true
+      },
+      "result": {
+        "decision": "REQUEST_CLARIFICATION",
+        "confidence_band": "LOW",
+        "generation_attempted": false,
+        "safe_draft_ready": false
+      }
+    },
+    {
+      "name": "verified commerce decision",
+      "latency": {
+        "samples": 3,
+        "p50_ms": 537.93,
+        "p95_ms": 734.39,
+        "max_ms": 734.39,
+        "min_ms": 438.55,
+        "mean_ms": 570.29,
+        "target_ms": 8000.0,
+        "p95_target_met": true
+      },
+      "result": {
+        "decision": "AUTO_RESPOND",
+        "confidence_band": "HIGH",
+        "generation_attempted": false,
+        "safe_draft_ready": true,
+        "order_number": "#NS10041",
+        "order_status": "IN_TRANSIT"
+      }
+    },
+    {
+      "name": "knowledge retrieval only",
+      "latency": {
+        "samples": 5,
+        "p50_ms": 109.76,
+        "p95_ms": 1320.32,
+        "max_ms": 1320.32,
+        "min_ms": 82.33,
+        "mean_ms": 358.76,
+        "target_ms": 8000.0,
+        "p95_target_met": true
+      },
+      "result": null
+    },
+    {
+      "name": "full grounded RAG decision",
+      "latency": {
+        "samples": 3,
+        "p50_ms": 6042.98,
+        "p95_ms": 6325.45,
+        "max_ms": 6325.45,
+        "min_ms": 5668.44,
+        "mean_ms": 6012.29,
+        "target_ms": 8000.0,
+        "p95_target_met": true
+      },
+      "result": {
+        "decision": "AUTO_RESPOND",
+        "confidence_band": "HIGH",
+        "generation_attempted": true,
+        "safe_draft_ready": true,
+        "evidence_count": 5,
+        "answer_status": "ANSWERED"
+      }
+    }
+  ],
+  "rag_generation_latency": {
+    "samples": 3,
+    "p50_ms": 5784.17,
+    "p95_ms": 5793.09,
+    "max_ms": 5793.09,
+    "min_ms": 5445.44,
+    "mean_ms": 5674.23
+  },
+  "performance_target_met": true,
+  "measurement_complete": true,
+  "existing_regression_coverage": [
+    "health readiness returns 503 when database checks fail",
+    "chat delivery is idempotent",
+    "email uncertain delivery is not persisted as sent",
+    "confirmed email failure can retry the same delivery",
+    "restricted and prompt-injection requests bypass providers"
+  ]
+}
