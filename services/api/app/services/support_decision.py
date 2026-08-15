@@ -76,6 +76,90 @@ def decide_support_action(
 ) -> UnifiedSafetyDecision:
 
     # ======================================================
+    # GATE 0
+    # Prompt injection is a security-control failure, not a
+    # support intent. It must fail closed before commerce,
+    # retrieval, or generation is considered.
+    #
+    # The prompt-injection detector is wired into the same
+    # pre-provider category channel as restricted operations so
+    # the existing orchestration path can enforce it without
+    # relying on an LLM to police another LLM.
+    # ======================================================
+
+    if "PROMPT_INJECTION" in restricted_categories:
+
+        operational_categories = tuple(
+            category
+
+            for category
+            in restricted_categories
+
+            if category != "PROMPT_INJECTION"
+        )
+
+        reasons: list[str] = [
+            "PROMPT_INJECTION_DETECTED",
+            "SECURITY_REVIEW_REQUIRED",
+        ]
+
+        if operational_categories:
+
+            reasons.append(
+                "RESTRICTED_ACTION_DETECTED"
+            )
+
+            reasons.extend(
+                (
+                    "RESTRICTED_ACTION:"
+                    + category
+                )
+
+                for category
+                in operational_categories
+            )
+
+        reasons.extend(
+            [
+                "HUMAN_ACTION_REQUIRED",
+                "AUTO_RESPONSE_BLOCKED",
+            ]
+        )
+
+        escalation_reason = (
+            "PROMPT_INJECTION"
+        )
+
+        if operational_categories:
+
+            escalation_reason += (
+                "|RESTRICTED_ACTION:"
+                + ",".join(
+                    operational_categories
+                )
+            )
+
+        return UnifiedSafetyDecision(
+            decision=
+                "REVIEW_REQUIRED",
+
+            ticket_status=
+                "REVIEW_REQUIRED",
+
+            safe_draft_ready=
+                False,
+
+            reasons=
+                tuple(
+                    reasons
+                ),
+
+            escalation_reason=
+                escalation_reason,
+        )
+
+
+    # ======================================================
     # GATE 1
     # Restricted operations always require human review.
     # ======================================================

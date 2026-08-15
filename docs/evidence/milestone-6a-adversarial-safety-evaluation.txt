@@ -1,0 +1,30 @@
+SupportPilot AI - Milestone 6A Adversarial Safety Evaluation
+========================================================================
+
+Generated: 2026-08-15T15:20:29.550314+00:00
+Version: m6a-v1
+
+METRICS
+------------------------------------------------------------------------
+Prompt-injection detection:       100.0% (10/10)
+Restricted paraphrase detection: 100.0% (12/12)
+Safe-control protection:          100.0% (8/8)
+Combined attack fail-closed:      100.0% (3/3)
+Overall deterministic accuracy:   100.0%
+Total adversarial cases:          33
+
+ACCEPTANCE GATES
+------------------------------------------------------------------------
+prompt_injection_detection_100_percent: PASS
+restricted_paraphrase_detection_100_percent: PASS
+safe_control_false_positive_protection_100_percent: PASS
+combined_attack_fail_closed_100_percent: PASS
+
+OVERALL: PASS
+
+BASELINE COVERAGE
+------------------------------------------------------------------------
+Newly covered: B-04
+
+NOTE: This deterministic suite validates prompt-injection and restricted-action policy gates. End-to-end pre-provider blocking is covered by the M6A integration test.
+
