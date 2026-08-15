@@ -1,0 +1,42 @@
+﻿[
+    {
+        "file":  "evidence/milestone-3-rag-evaluation.json",
+        "exists":  true,
+        "sha256":  "8804b74340c8b25ae8cc26d0978545df5be353ab4104d3c53dc9a8fc846493ac"
+    },
+    {
+        "file":  "evidence/milestone-3-rag-evaluation.txt",
+        "exists":  true,
+        "sha256":  "f1015b394d311ccc422b02a4040236d7625b12a2169f2097010f28bd30e56b5b"
+    },
+    {
+        "file":  "evidence/milestone-4-commerce-safety-evaluation.json",
+        "exists":  true,
+        "sha256":  "b35455a4a640721e2055703e988af092e469bb4850ab0651805c20abed6f58e5"
+    },
+    {
+        "file":  "evidence/milestone-4-commerce-safety-evaluation.txt",
+        "exists":  true,
+        "sha256":  "48cff1b7ca2178be6f0537cc3dc76ded3aadd123389bb920fbc7a6bb612322cb"
+    },
+    {
+        "file":  "evidence/milestone-6a-adversarial-safety-evaluation.json",
+        "exists":  true,
+        "sha256":  "bf5a5b4751730d5e90ea970d198cc8293e3cb4b8979a4cf6980721aa74036bfc"
+    },
+    {
+        "file":  "evidence/milestone-6a-adversarial-safety-evaluation.txt",
+        "exists":  true,
+        "sha256":  "bab7ff942a56ad4d5b0cb9446291ba60ddcacfa928c3997369522649c3040f54"
+    },
+    {
+        "file":  "evidence/milestone-6b-reliability-performance.json",
+        "exists":  true,
+        "sha256":  "df0e99387f910f4d9f900e92efd072798c1858a9ad5f2a72ac949ba0a427f5c0"
+    },
+    {
+        "file":  "evidence/milestone-6b-reliability-performance.txt",
+        "exists":  true,
+        "sha256":  "3fb0167c0841b7a99cfa9e0fbcd6432ebca0e3c6f999c58024918111f54b84a8"
+    }
+]

@@ -1,7 +1,7 @@
 SupportPilot AI — Milestone 3 RAG Evaluation
 ====================================================
 
-Generated: 2026-08-12T14:51:10.371851+00:00
+Generated: 2026-08-15T16:56:47.884190+00:00
 Provider: local-fastembed
 Model: BAAI/bge-small-en-v1.5::repeat4-1536
 Dimensions: 1536

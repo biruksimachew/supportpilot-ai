@@ -1,7 +1,7 @@
 SupportPilot AI - Milestone 6B Reliability and Performance
 ========================================================================
 
-Generated: 2026-08-15T15:43:37.901581+00:00
+Generated: 2026-08-15T16:56:54.583141+00:00
 
 RELIABILITY
 ------------------------------------------------------------------------
@@ -16,13 +16,13 @@ Reliability overall: PASS
 PERFORMANCE
 ------------------------------------------------------------------------
 Local chat-decision target: 8000 ms
-restricted action decision: p50=96.32 ms | p95=140.48 ms | max=140.48 ms | target=PASS
-prompt injection decision: p50=81.25 ms | p95=108.14 ms | max=108.14 ms | target=PASS
-unverified commerce decision: p50=129.59 ms | p95=177.09 ms | max=177.09 ms | target=PASS
-verified commerce decision: p50=537.93 ms | p95=734.39 ms | max=734.39 ms | target=PASS
-knowledge retrieval only: p50=109.76 ms | p95=1320.32 ms | max=1320.32 ms | target=PASS
-full grounded RAG decision: p50=6042.98 ms | p95=6325.45 ms | max=6325.45 ms | target=PASS
-RAG model generation only: p50=5784.17 ms | p95=5793.09 ms
+restricted action decision: p50=77.77 ms | p95=107.08 ms | max=107.08 ms | target=PASS
+prompt injection decision: p50=79.73 ms | p95=81.95 ms | max=81.95 ms | target=PASS
+unverified commerce decision: p50=108.55 ms | p95=133.63 ms | max=133.63 ms | target=PASS
+verified commerce decision: p50=271.28 ms | p95=282.57 ms | max=282.57 ms | target=PASS
+knowledge retrieval only: p50=96.91 ms | p95=356.91 ms | max=356.91 ms | target=PASS
+full grounded RAG decision: p50=5786.43 ms | p95=5971.36 ms | max=5971.36 ms | target=PASS
+RAG model generation only: p50=5578.66 ms | p95=5678.91 ms
 
 Performance target overall: PASS
 

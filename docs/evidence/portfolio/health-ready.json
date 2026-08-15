@@ -1,0 +1,8 @@
+﻿{
+    "status":  "ready",
+    "service":  "supportpilot-api",
+    "dependencies":  {
+                         "database":  true,
+                         "pgvector":  true
+                     }
+}
