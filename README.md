@@ -26,7 +26,7 @@ SupportPilot AI treats the model as one component inside a controlled support sy
 | Cross-customer gate violations | **0** |
 | Adversarial hardening evaluation | **33/33 passed** |
 | Reliability failure contracts | **All passed** |
-| Full grounded RAG decision latency | **p95 6.33 s local**, below the 8 s demo target |
+| Full grounded RAG decision latency | **p95 5.97 s local**, below the 8 s demo target |
 
 These are portfolio/test-environment measurements, not production SLAs. Full evidence is committed under [`docs/evidence/`](docs/evidence/).
 
